@@ -330,12 +330,10 @@ li#menu-academico{
 .profile_details {
     float: left;
     /*width: 24.25%;*/
-    background: #5785c3;
     text-align: center;
     padding: 0.3em 1em;
 }
 .logo-w3-agile {
-    background: #5785c3;
     float: left;
     width: 24.25%;
     text-align: center;
