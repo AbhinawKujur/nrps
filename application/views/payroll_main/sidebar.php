@@ -72,41 +72,24 @@
 								</li>
 							<?php endif; ?> -->
 
-			<?php if (in_array('viewApplyLeave', permission_data) || in_array('viewLeaveApproval', permission_data)) : ?>
-				<li id="menu-academico"><a href="#"><i class="fa fa-dashboard" aria-hidden="true"></i><span> My Desk</span> <span class="fa fa-angle-right" style="float: right"></span>
-						<div class="clearfix"></div>
-					</a>
-					<ul id="menu-academico-sub">
-						<?php if (in_array('viewApplyLeave', permission_data)) { ?>
-							<li><a class='' href="<?php echo base_url('leave/applyleave'); ?>"> Apply Leave</a></li>
-						<?php } ?>
-						<?php if (in_array('viewLeaveApproval', permission_data)) { ?>
-							<li><a class='' href="<?php echo base_url('leave/Leaveapproval'); ?>"> Leave Approval</a></li>
-						<?php } ?>
-						<li><a class='' href="<?php echo base_url('payroll/dashboard/myattendance'); ?>"> My Attendance</a></li>
 
-						<li><a class='' href="<?php echo base_url('payroll/dashboard/dashboard/profile'); ?>"> Profile</a></li>
-						<li><a class='' href="#" onclick="changePassword('<?php echo $this->session->userdata('user_id'); ?>')"> Change Password</a></li>
-					</ul>
-				</li>
-			<?php endif; ?>
 
 
 			<?php if (in_array('viewVisitorTypeMaster', permission_data) || in_array('viewVisitorPurposeMaster', permission_data) || in_array('viewDepartmentMaster', permission_data) || in_array('viewVisitMaster', permission_data) || in_array('viewEntryModeMaster', permission_data) || in_array('viewaddVisitorForm', permission_data)) :
 			?>
-			<li id="menu-academico"><a href="#"><i class="fa fa-clock-o"></i><span>Reception </span> <span class="fa fa-angle-right" style="float: right"></span>
-					<div class="clearfix"></div>
-				</a>
-				<ul id="menu-academico-sub">
-					<li id="menu-academico-avaliacoes"><a href="<?php echo base_url('reception/Visitortype_master') ?>">Visitor Type Master</a></li>
-					<li id="menu-academico-avaliacoes"><a href="<?php echo base_url('reception/Visitorpurpose_master') ?>">Visitor Purpose Master</a></li>
-					<li id="menu-academico-avaliacoes"><a href="<?php echo base_url('reception/Department_master') ?>"> Department Master</a></li>
-					<li id="menu-academico-avaliacoes"><a href="<?php echo base_url('reception/Visit_master') ?>"> Visit Master</a></li>
-					<li id="menu-academico-avaliacoes"><a href="<?php echo base_url('reception/Sysmode_master') ?>">Entry Mode Master</a></li>
-					<li id="menu-academico-avaliacoes"><a href="<?php echo base_url('reception/Visitreg_form') ?>">Visitor Form</a></li>
-				</ul>
-			</li>
-			<?php endif; 
+				<li id="menu-academico"><a href="#"><i class="fa fa-clock-o"></i><span>Reception </span> <span class="fa fa-angle-right" style="float: right"></span>
+						<div class="clearfix"></div>
+					</a>
+					<ul id="menu-academico-sub">
+						<li id="menu-academico-avaliacoes"><a href="<?php echo base_url('reception/Visitortype_master') ?>">Visitor Type Master</a></li>
+						<li id="menu-academico-avaliacoes"><a href="<?php echo base_url('reception/Visitorpurpose_master') ?>">Visitor Purpose Master</a></li>
+						<li id="menu-academico-avaliacoes"><a href="<?php echo base_url('reception/Department_master') ?>"> Department Master</a></li>
+						<li id="menu-academico-avaliacoes"><a href="<?php echo base_url('reception/Visit_master') ?>"> Visit Master</a></li>
+						<li id="menu-academico-avaliacoes"><a href="<?php echo base_url('reception/Sysmode_master') ?>">Entry Mode Master</a></li>
+						<li id="menu-academico-avaliacoes"><a href="<?php echo base_url('reception/Visitreg_form') ?>">Visitor Form</a></li>
+					</ul>
+				</li>
+			<?php endif;
 			?>
 
 
@@ -173,22 +156,22 @@
 						<div class="clearfix"></div>
 					</a>
 					<ul id="menu-academico-sub">
-						
+
 						<?php if (in_array('viewClass', permission_data)) { ?>
 							<li id="menu-academico-avaliacoes"><a href="<?php echo base_url('Fees_master/class_master'); ?>">Class Master</a></li>
 						<?php } ?>
-						
+
 						<?php if (in_array('viewSection', permission_data)) { ?>
 							<li id="menu-academico-avaliacoes"><a href="<?php echo base_url('Fees_master/section_master'); ?>">Section Master</a></li>
-						
+
 							<li id="menu-academico-avaliacoes">
 								<a href="<?php echo base_url('timetable/assignclasswisesubject'); ?>">Class Wise Subject Allocation</a>
 							</li>
-						
-						<li id="menu-academico-avaliacoes">
+
+							<li id="menu-academico-avaliacoes">
 								<a href="<?php echo base_url('Teacher_master/clswise_subj_allco'); ?>">Add Subjects</a>
 							</li>
-						
+
 						<?php } ?>
 						<?php if (in_array('viewAssignClassTeacher', permission_data)) { ?>
 							<li><a class='' href="<?php echo base_url('teacher/assign_class_teacher'); ?>">Assign Class Teacher
@@ -204,12 +187,12 @@
 								<a href="<?php echo base_url('timetable/subjectAllocation'); ?>">Allocate Subject Teacher for Class</a>
 							</li>
 						<?php } ?>
-			
-			<?php if (in_array('viewAssignSubjectTeacher', permission_data)) { ?>
+
+						<?php if (in_array('viewAssignSubjectTeacher', permission_data)) { ?>
 							<!--<li><a class='' href="<?php //echo base_url('teacher/Assign_subject_teacher'); 
 														?>">Assign Subject Teacher</span><div class="clearfix"></div></a></li> -->
 							<li id="menu-academico-avaliacoes">
-								<a href="<?php echo base_url('timetable_report/timetablereport/teacherWiseSubjectAllocation'); ?>">Allocated  Teacher  Report</a>
+								<a href="<?php echo base_url('timetable_report/timetablereport/teacherWiseSubjectAllocation'); ?>">Allocated Teacher Report</a>
 							</li>
 						<?php } ?>
 
@@ -285,12 +268,12 @@
 						<?php } ?>
 						<?php if (in_array('viewDailyAttenReport', permission_data)) { ?>
 							<li><a class='' href="<?php echo base_url('student/report/attendancepercentagereport'); ?>">Attendance Percentage Report</a></li>
-						<li><a class='' href="<?php echo base_url('student/studentAttDelete'); ?>">Attendance Delete</a></li>
+							<li><a class='' href="<?php echo base_url('student/studentAttDelete'); ?>">Attendance Delete</a></li>
 						<?php } ?>
-						
-					
-						
-						
+
+
+
+
 					</ul>
 				</li>
 			<?php endif; ?>
@@ -306,17 +289,17 @@
 						<?php if (in_array('viewFeeHeadMaster', permission_data)) { ?>
 							<li id="menu-academico-avaliacoes"><a href="<?php echo base_url('Cmonthly_collection/month_collection'); ?>">Monthly Fee Collection</a></li>
 						<?php } ?>
-						
-							<?php if (in_array('viewFeeHeadMaster', permission_data)) { ?>
+
+						<?php if (in_array('viewFeeHeadMaster', permission_data)) { ?>
 							<li id="menu-academico-avaliacoes"><a href="<?php echo base_url('Fees_collection/pay_mode_update'); ?>">Change Payment Mode</a></li>
 						<?php } ?>
-						
+
 						<!--
 						<?php if (in_array('viewFeeHeadMaster', permission_data)) { ?>
 							<li id="menu-academico-avaliacoes"><a href="#" data-toggle="modal" data-target="#modalRegister">Verification Bank Payment</a></li>
 						<?php } ?> -->
-						
-						
+
+
 						<?php if (in_array('viewFeeHeadMaster', permission_data)) { ?>
 							<li id="menu-academico-avaliacoes"><a href="<?php echo base_url('Bank_collection/reports'); ?>">Bank Collection</a></li>
 						<?php } ?>
@@ -398,7 +381,7 @@
 							<!--<li id="menu-academico-avaliacoes" ><a class='' href="<?php echo base_url('gradejunior/CoscholasticClasses'); ?>">Co-Scholastic Grade Entry Junior</a></li>-->
 						<?php } ?>
 						<?php if (in_array('viewCoScholGrade', permission_data)) { ?>
-							<li id="menu-academico-avaliacoes" ><a class='' href="<?php echo base_url('gradejunior/GradeJunior'); 								?>">Marks Entry Junior</a></li>
+							<li id="menu-academico-avaliacoes"><a class='' href="<?php echo base_url('gradejunior/GradeJunior'); 								?>">Marks Entry Junior</a></li>
 						<?php } ?>
 						<?php if (in_array('viewDisciplineGrade', permission_data)) { ?>
 							<li id="menu-academico-avaliacoes"><a class='' href="<?php echo base_url('Grade/discipline_term'); ?>">Discipline Grade</a></li>
@@ -614,59 +597,59 @@
 					</ul>
 				</li>
 			<?php endif; ?>
-			<?php if (login_details['ROLE_ID']==11 || login_details['ROLE_ID']==4){?>
-			<li id="menu-academico"><a href="#"><i class="fa fa-book"></i><span> Library Master </span> <span class="fa fa-angle-right" style="float: right"></span>
-					<div class="clearfix"></div>
-				</a>
-				<ul id="menu-academico-sub">
-					<li id="menu-academico-avaliacoes"><a href="<?php echo base_url('library/RackMaster') ?>">Almirah Master</a></li>
-					<li id="menu-academico-avaliacoes"><a href="<?php echo base_url('library/BookTypeMaster') ?>">Book Type Master</a></li>
-					<li id="menu-academico-avaliacoes"><a href="<?php echo base_url('library/BookMaster') ?>"> Book Master</a></li>
-					<li id="menu-academico-avaliacoes"><a href="<?php echo base_url('library/NewsMagazineMaster') ?>"> News Paper/Magazine Master</a></li>
-					<li><a class='' href="<?php echo base_url('library/TeacherBookIssue/teacher_adv_book_issue'); ?>">Employee Advance Book Issue</a></li>
+			<?php if (login_details['ROLE_ID'] == 11 || login_details['ROLE_ID'] == 4) { ?>
+				<li id="menu-academico"><a href="#"><i class="fa fa-book"></i><span> Library Master </span> <span class="fa fa-angle-right" style="float: right"></span>
+						<div class="clearfix"></div>
+					</a>
+					<ul id="menu-academico-sub">
+						<li id="menu-academico-avaliacoes"><a href="<?php echo base_url('library/RackMaster') ?>">Almirah Master</a></li>
+						<li id="menu-academico-avaliacoes"><a href="<?php echo base_url('library/BookTypeMaster') ?>">Book Type Master</a></li>
+						<li id="menu-academico-avaliacoes"><a href="<?php echo base_url('library/BookMaster') ?>"> Book Master</a></li>
+						<li id="menu-academico-avaliacoes"><a href="<?php echo base_url('library/NewsMagazineMaster') ?>"> News Paper/Magazine Master</a></li>
+						<li><a class='' href="<?php echo base_url('library/TeacherBookIssue/teacher_adv_book_issue'); ?>">Employee Advance Book Issue</a></li>
 
 
-					<li id="menu-academico-avaliacoes"><a href="<?php echo base_url('library/NewsMagazineMaster/Journal_Entry') ?>"> News Paper Journal Entry</a></li>
+						<li id="menu-academico-avaliacoes"><a href="<?php echo base_url('library/NewsMagazineMaster/Journal_Entry') ?>"> News Paper Journal Entry</a></li>
 
-				</ul>
-			</li>
-			<?php //endif; 
-			?>
-			<?php //if(in_array('working', permission_data)): 
-			?>
-			<li id="menu-academico"><a href="#"><i class="fa fa-book"></i><span> Book Issue </span> <span class="fa fa-angle-right" style="float: right"></span>
-					<div class="clearfix"></div>
-				</a>
-				<ul id="menu-academico-sub">
-					<li id="menu-academico-avaliacoes"><a href="<?php echo base_url('library/StudentBookIssue') ?>">Student Book Issue</a></li>
-					<li id="menu-academico-avaliacoes"><a href="<?php echo base_url('library/StudentBookReturn') ?>">Student Book Return</a></li>
-					<li id="menu-academico-avaliacoes"><a href="<?php echo base_url('library/TeacherBookIssue') ?>"> Teacher Book Issue</a></li>
-					<li id="menu-academico-avaliacoes"><a href="<?php echo base_url('library/TeacherBookReturn') ?>"> Teacher Book Return</a></li>
-				</ul>
-			</li>
-			<?php //endif; 
-			?>
-			<?php //if(in_array('working', permission_data)): 
-			?>
-			<li id="menu-academico"><a href="#"><i class="fa fa-book"></i><span> Library Report </span> <span class="fa fa-angle-right" style="float: right"></span>
-					<div class="clearfix"></div>
-				</a>
-				<ul id="menu-academico-sub">
-					<li id="menu-academico-avaliacoes"><a href="<?php echo base_url('library/LibraryReport') ?>"> Book Issue Report Student</a></li>
-					<li id="menu-academico-avaliacoes"><a href="<?php echo base_url('library/LibraryReport/book_report_emp') ?>"> Book Issue Report Employee</a></li>
-					<li id="menu-academico-avaliacoes"><a href="<?php echo base_url('library/LibraryReport/book_report_sts') ?>"> Book Issue Status Report</a></li>
-					<li id="menu-academico-avaliacoes"><a href="<?php echo base_url('library/LibraryReport/BookReturnRpt') ?>">Book Returned Report</a></li>
-					<li id="menu-academico-avaliacoes"><a href="<?php echo base_url('library/LibraryReport/BookReturnRpt') ?>">Book Returned Report Employee</a></li>
-					<li id="menu-academico-avaliacoes"><a href="<?php echo base_url('library/LibraryReport/BookStockReg') ?>"> Book Stock Register</a></li>
-					<li id="menu-academico-avaliacoes"><a href="<?php echo base_url('library/LibraryReport/BookStockReg_bw_lost') ?>"> Book Lost & Damage</a></li>
-					<li id="menu-academico-avaliacoes"><a href="<?php echo base_url('library/NewsMagazineMaster/newspaper_report') ?>"> News Paper Report</a></li>
-					<li id="menu-academico-avaliacoes"><a href="<?php echo base_url('library/LibraryReport/BookStockReg_bw') ?>"> Book Wise Stock Register</a></li>
-					<li id="menu-academico-avaliacoes"><a href="<?php echo base_url('library/Barcode') ?>"> Book Barcode</a></li>
-					<li id="menu-academico-avaliacoes"><a href="<?php echo base_url('library/RackMaster/newAlmirahMaster') ?>">Almirah Wise Report</a></li>
-				</ul>
-			</li>
-			<?php // endif; 
-			?>
+					</ul>
+				</li>
+				<?php //endif; 
+				?>
+				<?php //if(in_array('working', permission_data)): 
+				?>
+				<li id="menu-academico"><a href="#"><i class="fa fa-book"></i><span> Book Issue </span> <span class="fa fa-angle-right" style="float: right"></span>
+						<div class="clearfix"></div>
+					</a>
+					<ul id="menu-academico-sub">
+						<li id="menu-academico-avaliacoes"><a href="<?php echo base_url('library/StudentBookIssue') ?>">Student Book Issue</a></li>
+						<li id="menu-academico-avaliacoes"><a href="<?php echo base_url('library/StudentBookReturn') ?>">Student Book Return</a></li>
+						<li id="menu-academico-avaliacoes"><a href="<?php echo base_url('library/TeacherBookIssue') ?>"> Teacher Book Issue</a></li>
+						<li id="menu-academico-avaliacoes"><a href="<?php echo base_url('library/TeacherBookReturn') ?>"> Teacher Book Return</a></li>
+					</ul>
+				</li>
+				<?php //endif; 
+				?>
+				<?php //if(in_array('working', permission_data)): 
+				?>
+				<li id="menu-academico"><a href="#"><i class="fa fa-book"></i><span> Library Report </span> <span class="fa fa-angle-right" style="float: right"></span>
+						<div class="clearfix"></div>
+					</a>
+					<ul id="menu-academico-sub">
+						<li id="menu-academico-avaliacoes"><a href="<?php echo base_url('library/LibraryReport') ?>"> Book Issue Report Student</a></li>
+						<li id="menu-academico-avaliacoes"><a href="<?php echo base_url('library/LibraryReport/book_report_emp') ?>"> Book Issue Report Employee</a></li>
+						<li id="menu-academico-avaliacoes"><a href="<?php echo base_url('library/LibraryReport/book_report_sts') ?>"> Book Issue Status Report</a></li>
+						<li id="menu-academico-avaliacoes"><a href="<?php echo base_url('library/LibraryReport/BookReturnRpt') ?>">Book Returned Report</a></li>
+						<li id="menu-academico-avaliacoes"><a href="<?php echo base_url('library/LibraryReport/BookReturnRpt') ?>">Book Returned Report Employee</a></li>
+						<li id="menu-academico-avaliacoes"><a href="<?php echo base_url('library/LibraryReport/BookStockReg') ?>"> Book Stock Register</a></li>
+						<li id="menu-academico-avaliacoes"><a href="<?php echo base_url('library/LibraryReport/BookStockReg_bw_lost') ?>"> Book Lost & Damage</a></li>
+						<li id="menu-academico-avaliacoes"><a href="<?php echo base_url('library/NewsMagazineMaster/newspaper_report') ?>"> News Paper Report</a></li>
+						<li id="menu-academico-avaliacoes"><a href="<?php echo base_url('library/LibraryReport/BookStockReg_bw') ?>"> Book Wise Stock Register</a></li>
+						<li id="menu-academico-avaliacoes"><a href="<?php echo base_url('library/Barcode') ?>"> Book Barcode</a></li>
+						<li id="menu-academico-avaliacoes"><a href="<?php echo base_url('library/RackMaster/newAlmirahMaster') ?>">Almirah Wise Report</a></li>
+					</ul>
+				</li>
+				<?php // endif; 
+				?>
 			<?php } ?>
 
 			<?php if (in_array('viewNotice', permission_data) || in_array('viewSentNoticeDetails', permission_data) || in_array('viewNoticeP', permission_data) || in_array('viewNoticeReportP', permission_data)) : ?>
@@ -725,19 +708,19 @@
 					<ul id="menu-academico-sub">
 						<?php if (in_array('viewFeeReports', permission_data)) { ?>
 							<li id="menu-academico-avaliacoes"><a href="<?php echo base_url('Report/typeofreports'); ?>" title="Click For Reports">Fee Reports</a></li>
-						<li id="menu-academico-avaliacoes"><a href="<?php echo base_url('Bus_report/show_report') ?>">Bus Reports</a></li>
+							<li id="menu-academico-avaliacoes"><a href="<?php echo base_url('Bus_report/show_report') ?>">Bus Reports</a></li>
 						<?php } ?>
 						<?php if (in_array('viewFeeDefaulterList', permission_data)) { ?>
 							<li id="menu-academico-avaliacoes"><a href="<?php echo base_url('Report/Fee_Defaulter_List'); ?>">Fee Defaulter List</a></li>
 						<?php } ?>
-						
+
 
 						<!-- new 30/05/2023 -->
 						<?php if (in_array('viewFeeDefaulterList', permission_data)) { ?>
 							<li id="menu-academico-avaliacoes"><a href="<?php echo base_url('Report/Fee_Paid_List'); ?>">Fee Paid List</a></li>
 						<?php } ?>
-						
-							<?php if (in_array('viewFeeDefaulterList', permission_data)) { ?>
+
+						<?php if (in_array('viewFeeDefaulterList', permission_data)) { ?>
 							<li id="menu-academico-avaliacoes"><a href="<?php echo base_url('Report/Bank_trans'); ?>">Bank Transaction Report</a></li>
 						<?php } ?>
 
@@ -793,23 +776,23 @@
 						<?php if (in_array('viewFeeDefaulterList', permission_data)) { ?>
 							<li id="menu-academico-avaliacoes"><a href="<?php echo base_url('Reconcilation'); ?>">Receivable Report</a></li>
 						<?php } ?>
-						
+
 						<?php if (in_array('viewFeeDefaulterList', permission_data)) { ?>
 							<li id="menu-academico-avaliacoes"><a href="<?php echo base_url('Reconcilation/advance'); ?>">Advance Report</a></li>
 						<?php } ?>
-						
+
 						<?php if (in_array('viewFeeDefaulterList', permission_data)) { ?>
-							<li id="menu-academico-avaliacoes"><a href="<?php echo base_url('Reconcilation/prev_month_payment'); ?>">Prev. Month Collection  Report</a></li>
+							<li id="menu-academico-avaliacoes"><a href="<?php echo base_url('Reconcilation/prev_month_payment'); ?>">Prev. Month Collection Report</a></li>
 						<?php } ?>
 
 						<?php if (in_array('viewFeeDefaulterList', permission_data)) { ?>
 							<li id="menu-academico-avaliacoes"><a href="<?php echo base_url('Reconcilation/actual'); ?>">Actual Collection Report</a></li>
 						<?php } ?>
-						
+
 						<?php if (in_array('viewFeeDefaulterList', permission_data)) { ?>
 							<li id="menu-academico-avaliacoes"><a href="<?php echo base_url('Reconcilation/dues'); ?>">Dues Report</a></li>
 						<?php } ?>
-						
+
 					</ul>
 				</li>
 			<?php endif; ?>
@@ -1010,11 +993,14 @@
 								<a href="<?php echo base_url('bulk_updation/employeeleave'); ?>">Employee Leave</a>
 							</li>
 						<?php } ?>
-						<!--<?php //if (in_array('viewStudentDetails', permission_data)) { ?>
+						<!--<?php //if (in_array('viewStudentDetails', permission_data)) { 
+							?>
 							<li id="menu-academico-avaliacoes">
-								<a href="<?php //echo base_url('bulk_updation/Studentdetails'); ?>">Student Details</a>
+								<a href="<?php //echo base_url('bulk_updation/Studentdetails'); 
+											?>">Student Details</a>
 							</li>
-						<?php //} ?>-->
+						<?php //} 
+						?>-->
 						<?php if (in_array('viewStudentDetails', permission_data) || in_array('viewStudentMaster', permission_data)) { ?>
 							<li id="menu-academico-avaliacoes">
 								<a href="<?php echo base_url('bulk_updation/Classsecwise'); ?>">Class Sec Wise</a>
@@ -1044,7 +1030,7 @@
 			?>
 
 
-<?php if (in_array('viewDailyAttendance', permission_data) || in_array('viewDailyAttenReport', permission_data) || in_array('viewMonthlyAttenReport', permission_data) || in_array('viewStuAttenType', permission_data) || in_array('viewStuAttenType', permission_data) || in_array('viewStuAttenType', permission_data)) : ?>
+			<?php if (in_array('viewDailyAttendance', permission_data) || in_array('viewDailyAttenReport', permission_data) || in_array('viewMonthlyAttenReport', permission_data) || in_array('viewStuAttenType', permission_data) || in_array('viewStuAttenType', permission_data) || in_array('viewStuAttenType', permission_data)) : ?>
 				<li id="menu-academico"><a href="<?php echo base_url('Student_img'); ?>"><i class="fa fa-calendar-check-o" aria-hidden="true"></i><span>Upload Student Image</span> <span class="fa fa-angle-right" style="float: right"></span>
 						<div class="clearfix"></div>
 					</a>
@@ -1130,6 +1116,7 @@
 <script>
 	var toggle = true;
 
+	// Sidebar collapse/expand
 	$(".sidebar-icon").click(function() {
 		if (toggle) {
 			$(".page-container").addClass("sidebar-collapsed").removeClass("sidebar-collapsed-back");
@@ -1144,8 +1131,14 @@
 				});
 			}, 400);
 		}
-
 		toggle = !toggle;
+	});
+
+	// Submenu toggle on click
+	$("#menu-academico > a").click(function(e) {
+		e.preventDefault(); // Prevent default link behavior
+		$(this).parent().toggleClass("active");
+		$(this).next("#menu-academico-sub").slideToggle(300); // Toggle submenu with slide animation
 	});
 </script>
 <!--js -->
