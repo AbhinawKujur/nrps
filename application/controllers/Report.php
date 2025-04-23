@@ -1,0 +1,2468 @@
+<?php
+defined('BASEPATH') or exit('No direct script access allowed');
+
+class Report extends MY_Controller
+{
+	public function __construct()
+	{
+		parent::__construct();
+		$this->loggedOut();
+		$this->load->model('Mymodel', 'dbcon');
+	}
+	public function typeofreports()
+	{
+		$this->fee_template('Reports/reports');
+	}
+
+	public function pre_Fee_Defaulter_List_reman()
+	{
+
+		$class = $this->dbcon->select('previous_year_feegeneration', 'distinct(CLASS)');
+		$array = array(
+			'class' => $class
+		);
+		$this->fee_template('Reports/defaulter_list_pre', $array);
+	}
+	public function daily_monthlycollecion()
+	{
+		$ROLE_ID = $this->session->userdata('ROLE_ID');
+		$User_Id = $this->session->userdata('user_id');
+		if ($ROLE_ID == 10) { // setting role id for fee admin where role id is 10
+			$user_id = $this->dbcon->select('daycoll', 'DISTINCT(User_Id)', "Collection_mode='1'");
+		} elseif ($ROLE_ID == 4) { // setting role id for fee admin where role id is 4
+			$user_id = $this->dbcon->select('master', 'DISTINCT(User_Id)', "Collection_Type='1'");
+		} else { // setting role id for bank collection where role id is 14
+			$user_id = $this->dbcon->select('daycoll', 'DISTINCT(User_Id)', "User_Id='$User_Id'");
+		}
+		for ($i = 1; $i <= 25; $i++) {
+			$feehead[$i] = $this->dbcon->select('feehead', '*', "ACT_CODE='$i'");
+		}
+		$data = array(
+			'user_id' => $user_id,
+			'feehead1' => $feehead[1],
+			'feehead2' => $feehead[2],
+			'feehead3' => $feehead[3],
+			'feehead4' => $feehead[4],
+			'feehead5' => $feehead[5],
+			'feehead6' => $feehead[6],
+			'feehead7' => $feehead[7],
+			'feehead8' => $feehead[8],
+			'feehead9' => $feehead[9],
+			'feehead10' => $feehead[10],
+			'feehead11' => $feehead[11],
+			'feehead12' => $feehead[12],
+			'feehead13' => $feehead[13],
+			'feehead14' => $feehead[14],
+			'feehead15' => $feehead[15],
+			'feehead16' => $feehead[16],
+			'feehead17' => $feehead[17],
+			'feehead18' => $feehead[18],
+			'feehead19' => $feehead[19],
+			'feehead20' => $feehead[20],
+			'feehead21' => $feehead[21],
+			'feehead22' => $feehead[22],
+			'feehead23' => $feehead[23],
+			'feehead24' => $feehead[24],
+			'feehead25' => $feehead[25],
+			'ROLE_ID'  => $ROLE_ID
+		);
+		$this->fee_template('Reports/daily_monthlycollecion', $data);
+	}
+	public function single_date()
+	{
+		$collectiontype    = $this->input->post('collectiontype'); //1->school 3-online  2->bank
+		$feecollectiontype = $this->input->post('feecollectiontype');//all ,Monthly,PRE,MISL,NONE
+		$collectioncounter = $this->input->post('collectioncounter');// %
+		$single			   = $this->input->post('single'); //date(2023-07-18)
+		$date_type = $single;
+		for ($i = 1; $i <= 25; $i++) {
+			$feehead[$i] = $this->dbcon->select('feehead', '*', "ACT_CODE='$i'");
+		}
+
+		if ($feecollectiontype == 'All') {
+
+			if ($collectioncounter == '%') {
+				if ($collectiontype == 1) {
+					$data1 = $this->dbcon->select('daycoll', '*', "Collection_Mode=$collectiontype AND RECT_DATE='$date_type' AND RECT_NO  like 'A%'");
+				} elseif ($collectiontype == 2) {
+					$data1 = $this->dbcon->select('daycoll', '*', "Collection_Mode=1 AND RECT_DATE='$date_type' AND RECT_NO  like 'D%'");	
+				} else {
+					$data1 = $this->dbcon->select('daycoll', '*', "Collection_Mode=$collectiontype AND RECT_DATE='$date_type' AND RECT_NO  like 'ON%'");
+				}
+			} 
+			else {
+
+				$data1 = $this->dbcon->select('daycoll', '*', "User_Id LIKE '$collectioncounter' AND Collection_Mode=$collectiontype AND RECT_DATE='$date_type'");
+			}
+			// echo '<pre>';
+			// print_r($data1);
+			// die;
+			//echo $this->db->last_query();die;
+			$array = array(
+				'data1'     => $data1,
+				'feehead1'  => $feehead[1],
+				'feehead2'  => $feehead[2],
+				'feehead3'  => $feehead[3],
+				'feehead4'  => $feehead[4],
+				'feehead5'  => $feehead[5],
+				'feehead6'  => $feehead[6],
+				'feehead7'  => $feehead[7],
+				'feehead8'  => $feehead[8],
+				'feehead9'  => $feehead[9],
+				'feehead10' => $feehead[10],
+				'feehead11' => $feehead[11],
+				'feehead12' => $feehead[12],
+				'feehead13' => $feehead[13],
+				'feehead14' => $feehead[14],
+				'feehead15' => $feehead[15],
+				'feehead16' => $feehead[16],
+				'feehead17' => $feehead[17],
+				'feehead18' => $feehead[18],
+				'feehead19' => $feehead[19],
+				'feehead20' => $feehead[20],
+				'feehead21' => $feehead[21],
+				'feehead22' => $feehead[22],
+				'feehead23' => $feehead[23],
+				'feehead24' => $feehead[24],
+				'feehead25' => $feehead[25]
+			);
+			$this->load->view('Reports/daily_collection_report', $array);
+		} elseif ($feecollectiontype == 'PRE') {
+
+			if ($collectioncounter == '%') {
+				if ($collectiontype == 1) {
+					$data1 = $this->dbcon->select('previous_year_collection', '*', "Collection_Mode=$collectiontype AND RECT_DATE='$date_type' AND RECT_NO  like 'A%'");
+				} elseif ($collectiontype == 2) {
+					$data1 = $this->dbcon->select('previous_year_collection', '*', "Collection_Mode=1 AND RECT_DATE='$date_type' AND RECT_NO  like 'D%'");
+				} else {
+					$data1 = $this->dbcon->select('previous_year_collection', '*', "Collection_Mode=$collectiontype AND RECT_DATE='$date_type' AND RECT_NO  like 'ON%'");
+				}
+			}
+			
+			else {
+				$data1 = $this->dbcon->select('previous_year_collection', '*', "User_Id LIKE '$collectioncounter' AND Collection_Mode=$collectiontype AND RECT_DATE='$date_type'");
+			}
+
+			$array = array(
+				'data1'     => $data1,
+				'feehead1'  => $feehead[1],
+				'feehead2'  => $feehead[2],
+				'feehead3'  => $feehead[3],
+				'feehead4'  => $feehead[4],
+				'feehead5'  => $feehead[5],
+				'feehead6'  => $feehead[6],
+				'feehead7'  => $feehead[7],
+				'feehead8'  => $feehead[8],
+				'feehead9'  => $feehead[9],
+				'feehead10' => $feehead[10],
+				'feehead11' => $feehead[11],
+				'feehead12' => $feehead[12],
+				'feehead13' => $feehead[13],
+				'feehead14' => $feehead[14],
+				'feehead15' => $feehead[15],
+				'feehead16' => $feehead[16],
+				'feehead17' => $feehead[17],
+				'feehead18' => $feehead[18],
+				'feehead19' => $feehead[19],
+				'feehead20' => $feehead[20],
+				'feehead21' => $feehead[21],
+				'feehead22' => $feehead[22],
+				'feehead23' => $feehead[23],
+				'feehead24' => $feehead[24],
+				'feehead25' => $feehead[25]
+			);
+			$this->load->view('Reports/daily_collection_report', $array);
+
+		} else if ($feecollectiontype == 'Monthly') {
+			
+			if ($collectioncounter == '%') {
+				if ($collectiontype == 1) {
+					$data1 = $this->dbcon->select('daycoll', '*', "Collection_Mode=$collectiontype AND RECT_DATE='$date_type' AND RECT_NO  like 'A%'");
+				} elseif ($collectiontype == 2) {
+					$data1 = $this->dbcon->select('daycoll', '*', "Collection_Mode=1 AND RECT_DATE='$date_type' AND RECT_NO  like 'D%'");
+				} else {
+					$data1 = $this->dbcon->select('daycoll', '*', "Collection_Mode=$collectiontype AND RECT_DATE='$date_type' AND RECT_NO  like 'ON%'");
+				}
+			}
+			
+			else {
+				$data1 = $this->dbcon->select('daycoll', '*', "ADM_NO!='NONE' && mid(period,1,4)!='MISL' && mid(period,1,3)!='PRE' && User_Id LIKE '$collectioncounter' && Collection_Mode='$collectiontype' && RECT_DATE='$date_type'");
+			}
+
+			$array = array(
+				'data1'     => $data1,
+				'feehead1'  => $feehead[1],
+				'feehead2'  => $feehead[2],
+				'feehead3'  => $feehead[3],
+				'feehead4'  => $feehead[4],
+				'feehead5'  => $feehead[5],
+				'feehead6'  => $feehead[6],
+				'feehead7'  => $feehead[7],
+				'feehead8'  => $feehead[8],
+				'feehead9'  => $feehead[9],
+				'feehead10' => $feehead[10],
+				'feehead11' => $feehead[11],
+				'feehead12' => $feehead[12],
+				'feehead13' => $feehead[13],
+				'feehead14' => $feehead[14],
+				'feehead15' => $feehead[15],
+				'feehead16' => $feehead[16],
+				'feehead17' => $feehead[17],
+				'feehead18' => $feehead[18],
+				'feehead19' => $feehead[19],
+				'feehead20' => $feehead[20],
+				'feehead21' => $feehead[21],
+				'feehead22' => $feehead[22],
+				'feehead23' => $feehead[23],
+				'feehead24' => $feehead[24],
+				'feehead25' => $feehead[25]
+			);
+			$this->load->view('Reports/daily_collection_report', $array);
+
+		} else if ($feecollectiontype == 'MISL') {
+			$data1 = $this->dbcon->select('daycoll', '*', "mid(period,1,4)='MISL' && User_Id LIKE '$collectioncounter' && Collection_Mode='$collectiontype' && RECT_DATE='$date_type'");
+			$array = array(
+				'data1'     => $data1,
+				'feehead1'  => $feehead[1],
+				'feehead2'  => $feehead[2],
+				'feehead3'  => $feehead[3],
+				'feehead4'  => $feehead[4],
+				'feehead5'  => $feehead[5],
+				'feehead6'  => $feehead[6],
+				'feehead7'  => $feehead[7],
+				'feehead8'  => $feehead[8],
+				'feehead9'  => $feehead[9],
+				'feehead10' => $feehead[10],
+				'feehead11' => $feehead[11],
+				'feehead12' => $feehead[12],
+				'feehead13' => $feehead[13],
+				'feehead14' => $feehead[14],
+				'feehead15' => $feehead[15],
+				'feehead16' => $feehead[16],
+				'feehead17' => $feehead[17],
+				'feehead18' => $feehead[18],
+				'feehead19' => $feehead[19],
+				'feehead20' => $feehead[20],
+				'feehead21' => $feehead[21],
+				'feehead22' => $feehead[22],
+				'feehead23' => $feehead[23],
+				'feehead24' => $feehead[24],
+				'feehead25' => $feehead[25]
+			);
+			$this->load->view('Reports/daily_collection_report', $array);
+
+		} else if ($feecollectiontype == 'NONE') {
+			$data1 = $this->dbcon->select('daycoll', '*', "ADM_NO='NONE' && User_Id LIKE '$collectioncounter' && Collection_Mode='$collectiontype' && RECT_DATE='$date_type'");
+			$array = array(
+				'data1'     => $data1,
+				'feehead1'  => $feehead[1],
+				'feehead2'  => $feehead[2],
+				'feehead3'  => $feehead[3],
+				'feehead4'  => $feehead[4],
+				'feehead5'  => $feehead[5],
+				'feehead6'  => $feehead[6],
+				'feehead7'  => $feehead[7],
+				'feehead8'  => $feehead[8],
+				'feehead9'  => $feehead[9],
+				'feehead10' => $feehead[10],
+				'feehead11' => $feehead[11],
+				'feehead12' => $feehead[12],
+				'feehead13' => $feehead[13],
+				'feehead14' => $feehead[14],
+				'feehead15' => $feehead[15],
+				'feehead16' => $feehead[16],
+				'feehead17' => $feehead[17],
+				'feehead18' => $feehead[18],
+				'feehead19' => $feehead[19],
+				'feehead20' => $feehead[20],
+				'feehead21' => $feehead[21],
+				'feehead22' => $feehead[22],
+				'feehead23' => $feehead[23],
+				'feehead24' => $feehead[24],
+				'feehead25' => $feehead[25]
+			);
+			$this->load->view('Reports/daily_collection_report', $array);
+
+		} else {
+			$data1 = "dada";
+		}
+	}
+	public function single_date1()
+	{
+		$collectiontype    = $this->input->post('collectiontype');
+		$feecollectiontype = $this->input->post('feecollectiontype');
+		$collectioncounter = $this->input->post('collectioncounter');
+		$single			   = $this->input->post('single');
+		$date_type = $single;
+		for ($i = 1; $i <= 25; $i++) {
+			$feehead[$i] = $this->dbcon->select('feehead', '*', "ACT_CODE='$i'");
+		}
+
+		if ($feecollectiontype == 'All') {
+
+			if ($collectioncounter == '%') {
+				$data1 = $this->dbcon->select('daycoll', '*', "Collection_Mode=$collectiontype AND RECT_DATE='$date_type'");
+			} else {
+
+				$data1 = $this->dbcon->select('daycoll', '*', "User_Id LIKE '$collectioncounter' AND Collection_Mode=$collectiontype AND RECT_DATE='$date_type'");
+			}
+
+			$array = array(
+				'data1'     => $data1,
+				'feehead1'  => $feehead[1],
+				'feehead2'  => $feehead[2],
+				'feehead3'  => $feehead[3],
+				'feehead4'  => $feehead[4],
+				'feehead5'  => $feehead[5],
+				'feehead6'  => $feehead[6],
+				'feehead7'  => $feehead[7],
+				'feehead8'  => $feehead[8],
+				'feehead9'  => $feehead[9],
+				'feehead10' => $feehead[10],
+				'feehead11' => $feehead[11],
+				'feehead12' => $feehead[12],
+				'feehead13' => $feehead[13],
+				'feehead14' => $feehead[14],
+				'feehead15' => $feehead[15],
+				'feehead16' => $feehead[16],
+				'feehead17' => $feehead[17],
+				'feehead18' => $feehead[18],
+				'feehead19' => $feehead[19],
+				'feehead20' => $feehead[20],
+				'feehead21' => $feehead[21],
+				'feehead22' => $feehead[22],
+				'feehead23' => $feehead[23],
+				'feehead24' => $feehead[24],
+				'feehead25' => $feehead[25]
+			);
+			$this->load->view('Reports/daily_collection_report', $array);
+		} elseif ($feecollectiontype == 'PRE') {
+
+			if ($collectioncounter == '%') {
+				$data1 = $this->dbcon->select('previous_year_collection', '*', "Collection_Mode=$collectiontype AND RECT_DATE='$date_type'");
+			} else {
+
+				$data1 = $this->dbcon->select('previous_year_collection', '*', "User_Id LIKE '$collectioncounter' AND Collection_Mode=$collectiontype AND RECT_DATE='$date_type'");
+			}
+
+			$array = array(
+				'data1'     => $data1,
+				'feehead1'  => $feehead[1],
+				'feehead2'  => $feehead[2],
+				'feehead3'  => $feehead[3],
+				'feehead4'  => $feehead[4],
+				'feehead5'  => $feehead[5],
+				'feehead6'  => $feehead[6],
+				'feehead7'  => $feehead[7],
+				'feehead8'  => $feehead[8],
+				'feehead9'  => $feehead[9],
+				'feehead10' => $feehead[10],
+				'feehead11' => $feehead[11],
+				'feehead12' => $feehead[12],
+				'feehead13' => $feehead[13],
+				'feehead14' => $feehead[14],
+				'feehead15' => $feehead[15],
+				'feehead16' => $feehead[16],
+				'feehead17' => $feehead[17],
+				'feehead18' => $feehead[18],
+				'feehead19' => $feehead[19],
+				'feehead20' => $feehead[20],
+				'feehead21' => $feehead[21],
+				'feehead22' => $feehead[22],
+				'feehead23' => $feehead[23],
+				'feehead24' => $feehead[24],
+				'feehead25' => $feehead[25]
+			);
+			$this->load->view('Reports/daily_collection_report', $array);
+		} else if ($feecollectiontype == 'Monthly') {
+			if ($collectioncounter == '%') {
+				$data1 = $this->dbcon->select('daycoll', '*', "ADM_NO!='NONE' && mid(period,1,4)!='MISL' && mid(period,1,3)!='PRE' && Collection_Mode='$collectiontype' && RECT_DATE='$date_type'");
+			} else {
+				$data1 = $this->dbcon->select('daycoll', '*', "ADM_NO!='NONE' && mid(period,1,4)!='MISL' && mid(period,1,3)!='PRE' && User_Id LIKE '$collectioncounter' && Collection_Mode='$collectiontype' && RECT_DATE='$date_type'");
+			}
+
+			$array = array(
+				'data1'     => $data1,
+				'feehead1'  => $feehead[1],
+				'feehead2'  => $feehead[2],
+				'feehead3'  => $feehead[3],
+				'feehead4'  => $feehead[4],
+				'feehead5'  => $feehead[5],
+				'feehead6'  => $feehead[6],
+				'feehead7'  => $feehead[7],
+				'feehead8'  => $feehead[8],
+				'feehead9'  => $feehead[9],
+				'feehead10' => $feehead[10],
+				'feehead11' => $feehead[11],
+				'feehead12' => $feehead[12],
+				'feehead13' => $feehead[13],
+				'feehead14' => $feehead[14],
+				'feehead15' => $feehead[15],
+				'feehead16' => $feehead[16],
+				'feehead17' => $feehead[17],
+				'feehead18' => $feehead[18],
+				'feehead19' => $feehead[19],
+				'feehead20' => $feehead[20],
+				'feehead21' => $feehead[21],
+				'feehead22' => $feehead[22],
+				'feehead23' => $feehead[23],
+				'feehead24' => $feehead[24],
+				'feehead25' => $feehead[25]
+			);
+			$this->load->view('Reports/daily_collection_report', $array);
+		} else if ($feecollectiontype == 'MISL') {
+			$data1 = $this->dbcon->select('daycoll', '*', "mid(period,1,4)='MISL' && User_Id LIKE '$collectioncounter' && Collection_Mode='$collectiontype' && RECT_DATE='$date_type'");
+			$array = array(
+				'data1'     => $data1,
+				'feehead1'  => $feehead[1],
+				'feehead2'  => $feehead[2],
+				'feehead3'  => $feehead[3],
+				'feehead4'  => $feehead[4],
+				'feehead5'  => $feehead[5],
+				'feehead6'  => $feehead[6],
+				'feehead7'  => $feehead[7],
+				'feehead8'  => $feehead[8],
+				'feehead9'  => $feehead[9],
+				'feehead10' => $feehead[10],
+				'feehead11' => $feehead[11],
+				'feehead12' => $feehead[12],
+				'feehead13' => $feehead[13],
+				'feehead14' => $feehead[14],
+				'feehead15' => $feehead[15],
+				'feehead16' => $feehead[16],
+				'feehead17' => $feehead[17],
+				'feehead18' => $feehead[18],
+				'feehead19' => $feehead[19],
+				'feehead20' => $feehead[20],
+				'feehead21' => $feehead[21],
+				'feehead22' => $feehead[22],
+				'feehead23' => $feehead[23],
+				'feehead24' => $feehead[24],
+				'feehead25' => $feehead[25]
+			);
+			$this->load->view('Reports/daily_collection_report', $array);
+		} else if ($feecollectiontype == 'NONE') {
+			$data1 = $this->dbcon->select('daycoll', '*', "ADM_NO='NONE' && User_Id LIKE '$collectioncounter' && Collection_Mode='$collectiontype' && RECT_DATE='$date_type'");
+			$array = array(
+				'data1'     => $data1,
+				'feehead1'  => $feehead[1],
+				'feehead2'  => $feehead[2],
+				'feehead3'  => $feehead[3],
+				'feehead4'  => $feehead[4],
+				'feehead5'  => $feehead[5],
+				'feehead6'  => $feehead[6],
+				'feehead7'  => $feehead[7],
+				'feehead8'  => $feehead[8],
+				'feehead9'  => $feehead[9],
+				'feehead10' => $feehead[10],
+				'feehead11' => $feehead[11],
+				'feehead12' => $feehead[12],
+				'feehead13' => $feehead[13],
+				'feehead14' => $feehead[14],
+				'feehead15' => $feehead[15],
+				'feehead16' => $feehead[16],
+				'feehead17' => $feehead[17],
+				'feehead18' => $feehead[18],
+				'feehead19' => $feehead[19],
+				'feehead20' => $feehead[20],
+				'feehead21' => $feehead[21],
+				'feehead22' => $feehead[22],
+				'feehead23' => $feehead[23],
+				'feehead24' => $feehead[24],
+				'feehead25' => $feehead[25]
+			);
+			$this->load->view('Reports/daily_collection_report', $array);
+		} else {
+			$data1 = "dada";
+		}
+	}
+	public function mult_date()
+	{
+		// echo "<pre>";print_r($_POST);die;
+		$collectiontype = $this->input->post('collectiontype');
+		$feecollectiontype = $this->input->post('feecollectiontype');
+		$collectioncounter = $this->input->post('collectioncounter');
+		$multiple_date1	   = $this->input->post('multiple_date1');
+		$multiple_date2	   = $this->input->post('multiple_date2');
+		// Declare an empty array 
+		$array_date = array();
+
+		// Use strtotime function 
+		$Variable1 = strtotime($multiple_date1);
+		$Variable2 = strtotime($multiple_date2);
+
+		// Use for loop to store dates into array 
+		// 86400 sec = 24 hrs = 60*60*24 = 1 day 
+		for (
+			$currentDate = $Variable1;
+			$currentDate <= $Variable2;
+			$currentDate += (86400)
+		) {
+
+			$Store = date('Y-m-d', $currentDate);
+			$array_date[] = $Store;
+		}
+		// echo "<pre>";print_r($array_date);die;
+		$count_date = count($array_date);
+
+		for ($i = 1; $i <= 25; $i++) {
+			$feehead[$i] = $this->dbcon->select('feehead', '*', "ACT_CODE='$i'");
+		}
+
+		if ($feecollectiontype == 'All') {
+
+			$data_array = array();
+			for ($i = 0; $i < $count_date; $i++) {
+				if ($collectioncounter == '%') {
+					if ($collectiontype == 2) {
+						$data1 = $this->dbcon->selectSingleData('daycoll', 'DISTINCT(RECT_DATE)AS RECT_DATE, min(RECT_NO) AS RECT_NO_start, MAX(RECT_NO) AS RECT_NO_end, sum(TOTAL) AS TOTAL, sum(Fee1) AS Fee1, SUM(Fee2) AS Fee2, SUM(Fee3)Fee3, sum(Fee4)Fee4, sum(Fee5)Fee5, sum(Fee6)Fee6, sum(Fee7)Fee7, sum(Fee8)Fee8, sum(Fee9)Fee9, sum(Fee10)Fee10, sum(Fee11)Fee11, SUM(Fee12)Fee12, sum(Fee13)Fee13, SUM(Fee14)Fee14, SUM(Fee15)Fee15, sum(Fee16)Fee16, sum(Fee17)Fee17, sum(Fee18)Fee18, sum(Fee19)Fee19, sum(Fee20)Fee20, sum(Fee21)Fee21, sum(Fee22)Fee22, SUM(Fee23)Fee23, sum(Fee24)Fee24, SUM(Fee25)Fee25 ,SUM(PAID_AMOUNT)PAID_AMOUNT,SUM(SHORT_AMOUNT)SHORT_AMOUNT,SUM(Recovered_Short_Amt)Recovered_Short_Amt', "RECT_DATE ='$array_date[$i]' AND RECT_NO LIKE 'D%'");
+						$data_array[] = $data1;
+					} elseif ($collectiontype == 3) {
+						$data1 = $this->dbcon->selectSingleData('daycoll', 'DISTINCT(RECT_DATE)AS RECT_DATE, min(RECT_NO) AS RECT_NO_start, MAX(RECT_NO) AS RECT_NO_end, sum(TOTAL) AS TOTAL, sum(Fee1) AS Fee1, SUM(Fee2) AS Fee2, SUM(Fee3)Fee3, sum(Fee4)Fee4, sum(Fee5)Fee5, sum(Fee6)Fee6, sum(Fee7)Fee7, sum(Fee8)Fee8, sum(Fee9)Fee9, sum(Fee10)Fee10, sum(Fee11)Fee11, SUM(Fee12)Fee12, sum(Fee13)Fee13, SUM(Fee14)Fee14, SUM(Fee15)Fee15, sum(Fee16)Fee16, sum(Fee17)Fee17, sum(Fee18)Fee18, sum(Fee19)Fee19, sum(Fee20)Fee20, sum(Fee21)Fee21, sum(Fee22)Fee22, SUM(Fee23)Fee23, sum(Fee24)Fee24, SUM(Fee25)Fee25 ,SUM(PAID_AMOUNT)PAID_AMOUNT,SUM(SHORT_AMOUNT)SHORT_AMOUNT,SUM(Recovered_Short_Amt)Recovered_Short_Amt', "Collection_Mode=$collectiontype AND RECT_DATE='$array_date[$i]' AND RECT_NO LIKE 'ON%'");
+						$data_array[] = $data1;
+					} else {
+						$data1 = $this->dbcon->selectSingleData('daycoll', 'DISTINCT(RECT_DATE)AS RECT_DATE, min(RECT_NO) AS RECT_NO_start, MAX(RECT_NO) AS RECT_NO_end, sum(TOTAL) AS TOTAL, sum(Fee1) AS Fee1, SUM(Fee2) AS Fee2, SUM(Fee3)Fee3, sum(Fee4)Fee4, sum(Fee5)Fee5, sum(Fee6)Fee6, sum(Fee7)Fee7, sum(Fee8)Fee8, sum(Fee9)Fee9, sum(Fee10)Fee10, sum(Fee11)Fee11, SUM(Fee12)Fee12, sum(Fee13)Fee13, SUM(Fee14)Fee14, SUM(Fee15)Fee15, sum(Fee16)Fee16, sum(Fee17)Fee17, sum(Fee18)Fee18, sum(Fee19)Fee19, sum(Fee20)Fee20, sum(Fee21)Fee21, sum(Fee22)Fee22, SUM(Fee23)Fee23, sum(Fee24)Fee24, SUM(Fee25)Fee25 ,SUM(PAID_AMOUNT)PAID_AMOUNT,SUM(SHORT_AMOUNT)SHORT_AMOUNT,SUM(Recovered_Short_Amt)Recovered_Short_Amt', "Collection_Mode=$collectiontype AND RECT_DATE='$array_date[$i]' AND RECT_NO LIKE 'A%'");
+						$data_array[] = $data1;
+					}
+				} 
+				
+				
+				
+				else {
+
+					$data1 = $this->dbcon->selectSingleData('daycoll', 'DISTINCT(RECT_DATE)AS RECT_DATE, min(RECT_NO) AS RECT_NO_start, MAX(RECT_NO) AS RECT_NO_end, sum(TOTAL) AS TOTAL, sum(Fee1) AS Fee1, SUM(Fee2) AS Fee2, SUM(Fee3)Fee3, sum(Fee4)Fee4, sum(Fee5)Fee5, sum(Fee6)Fee6, sum(Fee7)Fee7, sum(Fee8)Fee8, sum(Fee9)Fee9, sum(Fee10)Fee10, sum(Fee11)Fee11, SUM(Fee12)Fee12, sum(Fee13)Fee13, SUM(Fee14)Fee14, SUM(Fee15)Fee15, sum(Fee16)Fee16, sum(Fee17)Fee17, sum(Fee18)Fee18, sum(Fee19)Fee19, sum(Fee20)Fee20, sum(Fee21)Fee21, sum(Fee22)Fee22, SUM(Fee23)Fee23, sum(Fee24)Fee24, SUM(Fee25)Fee25 , SUM(PAID_AMOUNT)PAID_AMOUNT , SUM(SHORT_AMOUNT)SHORT_AMOUNT,SUM(Recovered_Short_Amt)Recovered_Short_Amt', "User_Id LIKE '$collectioncounter' AND Collection_Mode=$collectiontype AND RECT_DATE='$array_date[$i]'");
+					$data_array[] = $data1;
+				}
+			}
+
+			$array = array(
+				'data_array' => $data_array,
+				'feehead1'  => $feehead[1],
+				'feehead2'  => $feehead[2],
+				'feehead3'  => $feehead[3],
+				'feehead4'  => $feehead[4],
+				'feehead5'  => $feehead[5],
+				'feehead6'  => $feehead[6],
+				'feehead7'  => $feehead[7],
+				'feehead8'  => $feehead[8],
+				'feehead9'  => $feehead[9],
+				'feehead10' => $feehead[10],
+				'feehead11' => $feehead[11],
+				'feehead12' => $feehead[12],
+				'feehead13' => $feehead[13],
+				'feehead14' => $feehead[14],
+				'feehead15' => $feehead[15],
+				'feehead16' => $feehead[16],
+				'feehead17' => $feehead[17],
+				'feehead18' => $feehead[18],
+				'feehead19' => $feehead[19],
+				'feehead20' => $feehead[20],
+				'feehead21' => $feehead[21],
+				'feehead22' => $feehead[22],
+				'feehead23' => $feehead[23],
+				'feehead24' => $feehead[24],
+				'feehead25' => $feehead[25]
+			);
+			$this->load->view('Reports/monthly_collection_report', $array);
+		} elseif ($feecollectiontype == 'PRE') {
+			$data_array = array();
+			for ($i = 0; $i < $count_date; $i++) {
+
+				if ($collectioncounter == '%') {
+					$data1 = $this->dbcon->selectSingleData('previous_year_collection', 'DISTINCT(RECT_DATE)AS RECT_DATE, min(RECT_NO) AS RECT_NO_start, MAX(RECT_NO) AS RECT_NO_end, sum(TOTAL) AS TOTAL, sum(Fee1) AS Fee1, SUM(Fee2) AS Fee2, SUM(Fee3)Fee3, sum(Fee4)Fee4, sum(Fee5)Fee5, sum(Fee6)Fee6, sum(Fee7)Fee7, sum(Fee8)Fee8, sum(Fee9)Fee9, sum(Fee10)Fee10, sum(Fee11)Fee11, SUM(Fee12)Fee12, sum(Fee13)Fee13, SUM(Fee14)Fee14, SUM(Fee15)Fee15, sum(Fee16)Fee16, sum(Fee17)Fee17, sum(Fee18)Fee18, sum(Fee19)Fee19, sum(Fee20)Fee20, sum(Fee21)Fee21, sum(Fee22)Fee22, SUM(Fee23)Fee23, sum(Fee24)Fee24, SUM(Fee25)Fee25,SUM(PAID_AMOUNT)PAID_AMOUNT , SUM(SHORT_AMOUNT)SHORT_AMOUNT,SUM(Recovered_Short_Amt)Recovered_Short_Amt', "Collection_Mode=$collectiontype AND RECT_DATE='$array_date[$i]'");
+
+					$data_array[] = $data1;
+				} else {
+
+					$data1 = $this->dbcon->selectSingleData('previous_year_collection', 'DISTINCT(RECT_DATE)AS RECT_DATE, min(RECT_NO) AS RECT_NO_start, MAX(RECT_NO) AS RECT_NO_end, sum(TOTAL) AS TOTAL, sum(Fee1) AS Fee1, SUM(Fee2) AS Fee2, SUM(Fee3)Fee3, sum(Fee4)Fee4, sum(Fee5)Fee5, sum(Fee6)Fee6, sum(Fee7)Fee7, sum(Fee8)Fee8, sum(Fee9)Fee9, sum(Fee10)Fee10, sum(Fee11)Fee11, SUM(Fee12)Fee12, sum(Fee13)Fee13, SUM(Fee14)Fee14, SUM(Fee15)Fee15, sum(Fee16)Fee16, sum(Fee17)Fee17, sum(Fee18)Fee18, sum(Fee19)Fee19, sum(Fee20)Fee20, sum(Fee21)Fee21, sum(Fee22)Fee22, SUM(Fee23)Fee23, sum(Fee24)Fee24, SUM(Fee25)Fee25 ,SUM(PAID_AMOUNT)PAID_AMOUNT , SUM(SHORT_AMOUNT)SHORT_AMOUNT,SUM(Recovered_Short_Amt)Recovered_Short_Amt', "User_Id LIKE '$collectioncounter' && Collection_Mode=$collectiontype AND RECT_DATE='$array_date[$i]'");
+					$data_array[] = $data1;
+				}
+			}
+
+			$array = array(
+				'data_array' => $data_array,
+				'feehead1'  => $feehead[1],
+				'feehead2'  => $feehead[2],
+				'feehead3'  => $feehead[3],
+				'feehead4'  => $feehead[4],
+				'feehead5'  => $feehead[5],
+				'feehead6'  => $feehead[6],
+				'feehead7'  => $feehead[7],
+				'feehead8'  => $feehead[8],
+				'feehead9'  => $feehead[9],
+				'feehead10' => $feehead[10],
+				'feehead11' => $feehead[11],
+				'feehead12' => $feehead[12],
+				'feehead13' => $feehead[13],
+				'feehead14' => $feehead[14],
+				'feehead15' => $feehead[15],
+				'feehead16' => $feehead[16],
+				'feehead17' => $feehead[17],
+				'feehead18' => $feehead[18],
+				'feehead19' => $feehead[19],
+				'feehead20' => $feehead[20],
+				'feehead21' => $feehead[21],
+				'feehead22' => $feehead[22],
+				'feehead23' => $feehead[23],
+				'feehead24' => $feehead[24],
+				'feehead25' => $feehead[25]
+			);
+			$this->load->view('Reports/monthly_collection_report', $array);
+		} else if ($feecollectiontype == 'Monthly') {
+			$data_array = array();
+			for ($i = 0; $i < $count_date; $i++) {
+				if ($collectioncounter == '%') {
+					$data1 = $this->dbcon->selectSingleData('daycoll', 'DISTINCT(RECT_DATE)AS RECT_DATE, min(RECT_NO) AS RECT_NO_start, MAX(RECT_NO) AS RECT_NO_end, sum(TOTAL) AS TOTAL, sum(Fee1) AS Fee1, SUM(Fee2) AS Fee2, SUM(Fee3)Fee3, sum(Fee4)Fee4, sum(Fee5)Fee5, sum(Fee6)Fee6, sum(Fee7)Fee7, sum(Fee8)Fee8, sum(Fee9)Fee9, sum(Fee10)Fee10, sum(Fee11)Fee11, SUM(Fee12)Fee12, sum(Fee13)Fee13, SUM(Fee14)Fee14, SUM(Fee15)Fee15, sum(Fee16)Fee16, sum(Fee17)Fee17, sum(Fee18)Fee18, sum(Fee19)Fee19, sum(Fee20)Fee20, sum(Fee21)Fee21, sum(Fee22)Fee22, SUM(Fee23)Fee23, sum(Fee24)Fee24, SUM(Fee25)Fee25,SUM(PAID_AMOUNT)PAID_AMOUNT , SUM(SHORT_AMOUNT)SHORT_AMOUNT,SUM(Recovered_Short_Amt)Recovered_Short_Amt', "ADM_NO!='NONE' && mid(period,1,4)!='MISL' && mid(period,1,3)!='PRE' && Collection_Mode='$collectiontype' && RECT_DATE='$array_date[$i]'");
+					$data_array[] = $data1;
+				} else {
+					$data1 = $this->dbcon->selectSingleData('daycoll', 'DISTINCT(RECT_DATE)AS RECT_DATE, min(RECT_NO) AS RECT_NO_start, MAX(RECT_NO) AS RECT_NO_end, sum(TOTAL) AS TOTAL, sum(Fee1) AS Fee1, SUM(Fee2) AS Fee2, SUM(Fee3)Fee3, sum(Fee4)Fee4, sum(Fee5)Fee5, sum(Fee6)Fee6, sum(Fee7)Fee7, sum(Fee8)Fee8, sum(Fee9)Fee9, sum(Fee10)Fee10, sum(Fee11)Fee11, SUM(Fee12)Fee12, sum(Fee13)Fee13, SUM(Fee14)Fee14, SUM(Fee15)Fee15, sum(Fee16)Fee16, sum(Fee17)Fee17, sum(Fee18)Fee18, sum(Fee19)Fee19, sum(Fee20)Fee20, sum(Fee21)Fee21, sum(Fee22)Fee22, SUM(Fee23)Fee23, sum(Fee24)Fee24, SUM(Fee25)Fee25,SUM(PAID_AMOUNT)PAID_AMOUNT , SUM(SHORT_AMOUNT)SHORT_AMOUNT,SUM(Recovered_Short_Amt)Recovered_Short_Amt', "ADM_NO!='NONE' && mid(period,1,4)!='MISL' && mid(period,1,3)!='PRE' && User_Id LIKE '$collectioncounter' && Collection_Mode='$collectiontype' && RECT_DATE='$array_date[$i]'");
+					$data_array[] = $data1;
+				}
+			}
+
+			$array = array(
+				'data_array' => $data_array,
+				'feehead1'  => $feehead[1],
+				'feehead2'  => $feehead[2],
+				'feehead3'  => $feehead[3],
+				'feehead4'  => $feehead[4],
+				'feehead5'  => $feehead[5],
+				'feehead6'  => $feehead[6],
+				'feehead7'  => $feehead[7],
+				'feehead8'  => $feehead[8],
+				'feehead9'  => $feehead[9],
+				'feehead10' => $feehead[10],
+				'feehead11' => $feehead[11],
+				'feehead12' => $feehead[12],
+				'feehead13' => $feehead[13],
+				'feehead14' => $feehead[14],
+				'feehead15' => $feehead[15],
+				'feehead16' => $feehead[16],
+				'feehead17' => $feehead[17],
+				'feehead18' => $feehead[18],
+				'feehead19' => $feehead[19],
+				'feehead20' => $feehead[20],
+				'feehead21' => $feehead[21],
+				'feehead22' => $feehead[22],
+				'feehead23' => $feehead[23],
+				'feehead24' => $feehead[24],
+				'feehead25' => $feehead[25]
+			);
+			$this->load->view('Reports/monthly_collection_report', $array);
+		} else if ($feecollectiontype == 'MISL') {
+			$data_array = array();
+			for ($i = 0; $i < $count_date; $i++) {
+				$data1 = $this->dbcon->selectSingleData('daycoll', 'DISTINCT(RECT_DATE)AS RECT_DATE, min(RECT_NO) AS RECT_NO_start, MAX(RECT_NO) AS RECT_NO_end, sum(TOTAL) AS TOTAL, sum(Fee1) AS Fee1, SUM(Fee2) AS Fee2, SUM(Fee3)Fee3, sum(Fee4)Fee4, sum(Fee5)Fee5, sum(Fee6)Fee6, sum(Fee7)Fee7, sum(Fee8)Fee8, sum(Fee9)Fee9, sum(Fee10)Fee10, sum(Fee11)Fee11, SUM(Fee12)Fee12, sum(Fee13)Fee13, SUM(Fee14)Fee14, SUM(Fee15)Fee15, sum(Fee16)Fee16, sum(Fee17)Fee17, sum(Fee18)Fee18, sum(Fee19)Fee19, sum(Fee20)Fee20, sum(Fee21)Fee21, sum(Fee22)Fee22, SUM(Fee23)Fee23, sum(Fee24)Fee24, SUM(Fee25)Fee25SUM(PAID_AMOUNT)PAID_AMOUNT , SUM(SHORT_AMOUNT)SHORT_AMOUNT,SUM(Recovered_Short_Amt)Recovered_Short_Amt', "mid(period,1,4)='MISL' && User_Id LIKE '$collectioncounter' && Collection_Mode='$collectiontype' && RECT_DATE='$array_date[$i]'");
+				$data_array[] = $data1;
+			}
+
+			$array = array(
+				'data_array' => $data_array,
+				'feehead1'  => $feehead[1],
+				'feehead2'  => $feehead[2],
+				'feehead3'  => $feehead[3],
+				'feehead4'  => $feehead[4],
+				'feehead5'  => $feehead[5],
+				'feehead6'  => $feehead[6],
+				'feehead7'  => $feehead[7],
+				'feehead8'  => $feehead[8],
+				'feehead9'  => $feehead[9],
+				'feehead10' => $feehead[10],
+				'feehead11' => $feehead[11],
+				'feehead12' => $feehead[12],
+				'feehead13' => $feehead[13],
+				'feehead14' => $feehead[14],
+				'feehead15' => $feehead[15],
+				'feehead16' => $feehead[16],
+				'feehead17' => $feehead[17],
+				'feehead18' => $feehead[18],
+				'feehead19' => $feehead[19],
+				'feehead20' => $feehead[20],
+				'feehead21' => $feehead[21],
+				'feehead22' => $feehead[22],
+				'feehead23' => $feehead[23],
+				'feehead24' => $feehead[24],
+				'feehead25' => $feehead[25]
+			);
+			$this->load->view('Reports/monthly_collection_report', $array);
+		} else if ($feecollectiontype == 'NONE') {
+			$data_array = array();
+			for ($i = 0; $i < $count_date; $i++) {
+				$data1 = $this->dbcon->selectSingleData('daycoll', 'DISTINCT(RECT_DATE)AS RECT_DATE, min(RECT_NO) AS RECT_NO_start, MAX(RECT_NO) AS RECT_NO_end, sum(TOTAL) AS TOTAL, sum(Fee1) AS Fee1, SUM(Fee2) AS Fee2, SUM(Fee3)Fee3, sum(Fee4)Fee4, sum(Fee5)Fee5, sum(Fee6)Fee6, sum(Fee7)Fee7, sum(Fee8)Fee8, sum(Fee9)Fee9, sum(Fee10)Fee10, sum(Fee11)Fee11, SUM(Fee12)Fee12, sum(Fee13)Fee13, SUM(Fee14)Fee14, SUM(Fee15)Fee15, sum(Fee16)Fee16, sum(Fee17)Fee17, sum(Fee18)Fee18, sum(Fee19)Fee19, sum(Fee20)Fee20, sum(Fee21)Fee21, sum(Fee22)Fee22, SUM(Fee23)Fee23, sum(Fee24)Fee24, SUM(Fee25)Fee25,SUM(PAID_AMOUNT)PAID_AMOUNT , SUM(SHORT_AMOUNT)SHORT_AMOUNT,SUM(Recovered_Short_Amt)Recovered_Short_Amt', "ADM_NO='NONE' && User_Id LIKE '$collectioncounter' && Collection_Mode='$collectiontype' && RECT_DATE='$array_date[$i]'");
+				$data_array[] = $data1;
+			}
+
+			$array = array(
+				'data_array' => $data_array,
+				'feehead1'  => $feehead[1],
+				'feehead2'  => $feehead[2],
+				'feehead3'  => $feehead[3],
+				'feehead4'  => $feehead[4],
+				'feehead5'  => $feehead[5],
+				'feehead6'  => $feehead[6],
+				'feehead7'  => $feehead[7],
+				'feehead8'  => $feehead[8],
+				'feehead9'  => $feehead[9],
+				'feehead10' => $feehead[10],
+				'feehead11' => $feehead[11],
+				'feehead12' => $feehead[12],
+				'feehead13' => $feehead[13],
+				'feehead14' => $feehead[14],
+				'feehead15' => $feehead[15],
+				'feehead16' => $feehead[16],
+				'feehead17' => $feehead[17],
+				'feehead18' => $feehead[18],
+				'feehead19' => $feehead[19],
+				'feehead20' => $feehead[20],
+				'feehead21' => $feehead[21],
+				'feehead22' => $feehead[22],
+				'feehead23' => $feehead[23],
+				'feehead24' => $feehead[24],
+				'feehead25' => $feehead[25]
+			);
+			$this->load->view('Reports/monthly_collection_report', $array);
+		} else {
+			$data1 = "dada";
+		}
+	}
+
+	public function mult_date1()
+	{
+		// echo "<pre>";print_r($_POST);die;
+		$collectiontype = $this->input->post('collectiontype');
+		$feecollectiontype = $this->input->post('feecollectiontype');
+		$collectioncounter = $this->input->post('collectioncounter');
+		$multiple_date1	   = $this->input->post('multiple_date1');
+		$multiple_date2	   = $this->input->post('multiple_date2');
+		
+		// Declare an empty array 
+		$array_date = array();
+
+		// Use strtotime function 
+		$Variable1 = strtotime($multiple_date1);
+		$Variable2 = strtotime($multiple_date2);
+
+		// Use for loop to store dates into array 
+		// 86400 sec = 24 hrs = 60*60*24 = 1 day 
+		for (
+			$currentDate = $Variable1;
+			$currentDate <= $Variable2;
+			$currentDate += (86400)
+		) {
+
+			$Store = date('Y-m-d', $currentDate);
+			$array_date[] = $Store;
+		}
+		// echo "<pre>";print_r($array_date);die;
+		$count_date = count($array_date);
+
+		for ($i = 1; $i <= 25; $i++) {
+			$feehead[$i] = $this->dbcon->select('feehead', '*', "ACT_CODE='$i'");
+		}
+
+		if ($feecollectiontype == 'All') {
+			$data_array = array();
+			for ($i = 0; $i < $count_date; $i++) {
+				if ($collectioncounter == '%') {
+					$data1 = $this->dbcon->selectSingleData('daycoll', 'DISTINCT(RECT_DATE)AS RECT_DATE, min(RECT_NO) AS RECT_NO_start, MAX(RECT_NO) AS RECT_NO_end, sum(TOTAL) AS TOTAL, sum(Fee1) AS Fee1, SUM(Fee2) AS Fee2, SUM(Fee3)Fee3, sum(Fee4)Fee4, sum(Fee5)Fee5, sum(Fee6)Fee6, sum(Fee7)Fee7, sum(Fee8)Fee8, sum(Fee9)Fee9, sum(Fee10)Fee10, sum(Fee11)Fee11, SUM(Fee12)Fee12, sum(Fee13)Fee13, SUM(Fee14)Fee14, SUM(Fee15)Fee15, sum(Fee16)Fee16, sum(Fee17)Fee17, sum(Fee18)Fee18, sum(Fee19)Fee19, sum(Fee20)Fee20, sum(Fee21)Fee21, sum(Fee22)Fee22, SUM(Fee23)Fee23, sum(Fee24)Fee24, SUM(Fee25)Fee25', "Collection_Mode=$collectiontype AND RECT_DATE='$array_date[$i]'");
+					$data_array[] = $data1;
+				} else {
+
+					$data1 = $this->dbcon->selectSingleData('daycoll', 'DISTINCT(RECT_DATE)AS RECT_DATE, min(RECT_NO) AS RECT_NO_start, MAX(RECT_NO) AS RECT_NO_end, sum(TOTAL) AS TOTAL, sum(Fee1) AS Fee1, SUM(Fee2) AS Fee2, SUM(Fee3)Fee3, sum(Fee4)Fee4, sum(Fee5)Fee5, sum(Fee6)Fee6, sum(Fee7)Fee7, sum(Fee8)Fee8, sum(Fee9)Fee9, sum(Fee10)Fee10, sum(Fee11)Fee11, SUM(Fee12)Fee12, sum(Fee13)Fee13, SUM(Fee14)Fee14, SUM(Fee15)Fee15, sum(Fee16)Fee16, sum(Fee17)Fee17, sum(Fee18)Fee18, sum(Fee19)Fee19, sum(Fee20)Fee20, sum(Fee21)Fee21, sum(Fee22)Fee22, SUM(Fee23)Fee23, sum(Fee24)Fee24, SUM(Fee25)Fee25', "User_Id LIKE '$collectioncounter' AND Collection_Mode=$collectiontype AND RECT_DATE='$array_date[$i]'");
+					$data_array[] = $data1;
+				}
+			}
+
+			$array = array(
+				'data_array' => $data_array,
+				'feehead1'  => $feehead[1],
+				'feehead2'  => $feehead[2],
+				'feehead3'  => $feehead[3],
+				'feehead4'  => $feehead[4],
+				'feehead5'  => $feehead[5],
+				'feehead6'  => $feehead[6],
+				'feehead7'  => $feehead[7],
+				'feehead8'  => $feehead[8],
+				'feehead9'  => $feehead[9],
+				'feehead10' => $feehead[10],
+				'feehead11' => $feehead[11],
+				'feehead12' => $feehead[12],
+				'feehead13' => $feehead[13],
+				'feehead14' => $feehead[14],
+				'feehead15' => $feehead[15],
+				'feehead16' => $feehead[16],
+				'feehead17' => $feehead[17],
+				'feehead18' => $feehead[18],
+				'feehead19' => $feehead[19],
+				'feehead20' => $feehead[20],
+				'feehead21' => $feehead[21],
+				'feehead22' => $feehead[22],
+				'feehead23' => $feehead[23],
+				'feehead24' => $feehead[24],
+				'feehead25' => $feehead[25]
+			);
+			$this->load->view('Reports/monthly_collection_report', $array);
+		} elseif ($feecollectiontype == 'PRE') {
+			$data_array = array();
+			for ($i = 0; $i < $count_date; $i++) {
+
+				if ($collectioncounter == '%') {
+					$data1 = $this->dbcon->selectSingleData('previous_year_collection', 'DISTINCT(RECT_DATE)AS RECT_DATE, min(RECT_NO) AS RECT_NO_start, MAX(RECT_NO) AS RECT_NO_end, sum(TOTAL) AS TOTAL, sum(Fee1) AS Fee1, SUM(Fee2) AS Fee2, SUM(Fee3)Fee3, sum(Fee4)Fee4, sum(Fee5)Fee5, sum(Fee6)Fee6, sum(Fee7)Fee7, sum(Fee8)Fee8, sum(Fee9)Fee9, sum(Fee10)Fee10, sum(Fee11)Fee11, SUM(Fee12)Fee12, sum(Fee13)Fee13, SUM(Fee14)Fee14, SUM(Fee15)Fee15, sum(Fee16)Fee16, sum(Fee17)Fee17, sum(Fee18)Fee18, sum(Fee19)Fee19, sum(Fee20)Fee20, sum(Fee21)Fee21, sum(Fee22)Fee22, SUM(Fee23)Fee23, sum(Fee24)Fee24, SUM(Fee25)Fee25', "Collection_Mode=$collectiontype AND RECT_DATE='$array_date[$i]'");
+
+					$data_array[] = $data1;
+				} else {
+
+					$data1 = $this->dbcon->selectSingleData('previous_year_collection', 'DISTINCT(RECT_DATE)AS RECT_DATE, min(RECT_NO) AS RECT_NO_start, MAX(RECT_NO) AS RECT_NO_end, sum(TOTAL) AS TOTAL, sum(Fee1) AS Fee1, SUM(Fee2) AS Fee2, SUM(Fee3)Fee3, sum(Fee4)Fee4, sum(Fee5)Fee5, sum(Fee6)Fee6, sum(Fee7)Fee7, sum(Fee8)Fee8, sum(Fee9)Fee9, sum(Fee10)Fee10, sum(Fee11)Fee11, SUM(Fee12)Fee12, sum(Fee13)Fee13, SUM(Fee14)Fee14, SUM(Fee15)Fee15, sum(Fee16)Fee16, sum(Fee17)Fee17, sum(Fee18)Fee18, sum(Fee19)Fee19, sum(Fee20)Fee20, sum(Fee21)Fee21, sum(Fee22)Fee22, SUM(Fee23)Fee23, sum(Fee24)Fee24, SUM(Fee25)Fee25', "User_Id LIKE '$collectioncounter' && Collection_Mode=$collectiontype AND RECT_DATE='$array_date[$i]'");
+					$data_array[] = $data1;
+				}
+			}
+
+			$array = array(
+				'data_array' => $data_array,
+				'feehead1'  => $feehead[1],
+				'feehead2'  => $feehead[2],
+				'feehead3'  => $feehead[3],
+				'feehead4'  => $feehead[4],
+				'feehead5'  => $feehead[5],
+				'feehead6'  => $feehead[6],
+				'feehead7'  => $feehead[7],
+				'feehead8'  => $feehead[8],
+				'feehead9'  => $feehead[9],
+				'feehead10' => $feehead[10],
+				'feehead11' => $feehead[11],
+				'feehead12' => $feehead[12],
+				'feehead13' => $feehead[13],
+				'feehead14' => $feehead[14],
+				'feehead15' => $feehead[15],
+				'feehead16' => $feehead[16],
+				'feehead17' => $feehead[17],
+				'feehead18' => $feehead[18],
+				'feehead19' => $feehead[19],
+				'feehead20' => $feehead[20],
+				'feehead21' => $feehead[21],
+				'feehead22' => $feehead[22],
+				'feehead23' => $feehead[23],
+				'feehead24' => $feehead[24],
+				'feehead25' => $feehead[25]
+			);
+			$this->load->view('Reports/monthly_collection_report', $array);
+		} else if ($feecollectiontype == 'Monthly') {
+			$data_array = array();
+			for ($i = 0; $i < $count_date; $i++) {
+				if ($collectioncounter == '%') {
+					$data1 = $this->dbcon->selectSingleData('daycoll', 'DISTINCT(RECT_DATE)AS RECT_DATE, min(RECT_NO) AS RECT_NO_start, MAX(RECT_NO) AS RECT_NO_end, sum(TOTAL) AS TOTAL, sum(Fee1) AS Fee1, SUM(Fee2) AS Fee2, SUM(Fee3)Fee3, sum(Fee4)Fee4, sum(Fee5)Fee5, sum(Fee6)Fee6, sum(Fee7)Fee7, sum(Fee8)Fee8, sum(Fee9)Fee9, sum(Fee10)Fee10, sum(Fee11)Fee11, SUM(Fee12)Fee12, sum(Fee13)Fee13, SUM(Fee14)Fee14, SUM(Fee15)Fee15, sum(Fee16)Fee16, sum(Fee17)Fee17, sum(Fee18)Fee18, sum(Fee19)Fee19, sum(Fee20)Fee20, sum(Fee21)Fee21, sum(Fee22)Fee22, SUM(Fee23)Fee23, sum(Fee24)Fee24, SUM(Fee25)Fee25', "ADM_NO!='NONE' && mid(period,1,4)!='MISL' && mid(period,1,3)!='PRE' && Collection_Mode='$collectiontype' && RECT_DATE='$array_date[$i]'");
+					$data_array[] = $data1;
+				} else {
+					$data1 = $this->dbcon->selectSingleData('daycoll', 'DISTINCT(RECT_DATE)AS RECT_DATE, min(RECT_NO) AS RECT_NO_start, MAX(RECT_NO) AS RECT_NO_end, sum(TOTAL) AS TOTAL, sum(Fee1) AS Fee1, SUM(Fee2) AS Fee2, SUM(Fee3)Fee3, sum(Fee4)Fee4, sum(Fee5)Fee5, sum(Fee6)Fee6, sum(Fee7)Fee7, sum(Fee8)Fee8, sum(Fee9)Fee9, sum(Fee10)Fee10, sum(Fee11)Fee11, SUM(Fee12)Fee12, sum(Fee13)Fee13, SUM(Fee14)Fee14, SUM(Fee15)Fee15, sum(Fee16)Fee16, sum(Fee17)Fee17, sum(Fee18)Fee18, sum(Fee19)Fee19, sum(Fee20)Fee20, sum(Fee21)Fee21, sum(Fee22)Fee22, SUM(Fee23)Fee23, sum(Fee24)Fee24, SUM(Fee25)Fee25', "ADM_NO!='NONE' && mid(period,1,4)!='MISL' && mid(period,1,3)!='PRE' && User_Id LIKE '$collectioncounter' && Collection_Mode='$collectiontype' && RECT_DATE='$array_date[$i]'");
+					$data_array[] = $data1;
+				}
+			}
+
+			$array = array(
+				'data_array' => $data_array,
+				'feehead1'  => $feehead[1],
+				'feehead2'  => $feehead[2],
+				'feehead3'  => $feehead[3],
+				'feehead4'  => $feehead[4],
+				'feehead5'  => $feehead[5],
+				'feehead6'  => $feehead[6],
+				'feehead7'  => $feehead[7],
+				'feehead8'  => $feehead[8],
+				'feehead9'  => $feehead[9],
+				'feehead10' => $feehead[10],
+				'feehead11' => $feehead[11],
+				'feehead12' => $feehead[12],
+				'feehead13' => $feehead[13],
+				'feehead14' => $feehead[14],
+				'feehead15' => $feehead[15],
+				'feehead16' => $feehead[16],
+				'feehead17' => $feehead[17],
+				'feehead18' => $feehead[18],
+				'feehead19' => $feehead[19],
+				'feehead20' => $feehead[20],
+				'feehead21' => $feehead[21],
+				'feehead22' => $feehead[22],
+				'feehead23' => $feehead[23],
+				'feehead24' => $feehead[24],
+				'feehead25' => $feehead[25]
+			);
+			$this->load->view('Reports/monthly_collection_report', $array);
+		} else if ($feecollectiontype == 'MISL') {
+			$data_array = array();
+			for ($i = 0; $i < $count_date; $i++) {
+				$data1 = $this->dbcon->selectSingleData('daycoll', 'DISTINCT(RECT_DATE)AS RECT_DATE, min(RECT_NO) AS RECT_NO_start, MAX(RECT_NO) AS RECT_NO_end, sum(TOTAL) AS TOTAL, sum(Fee1) AS Fee1, SUM(Fee2) AS Fee2, SUM(Fee3)Fee3, sum(Fee4)Fee4, sum(Fee5)Fee5, sum(Fee6)Fee6, sum(Fee7)Fee7, sum(Fee8)Fee8, sum(Fee9)Fee9, sum(Fee10)Fee10, sum(Fee11)Fee11, SUM(Fee12)Fee12, sum(Fee13)Fee13, SUM(Fee14)Fee14, SUM(Fee15)Fee15, sum(Fee16)Fee16, sum(Fee17)Fee17, sum(Fee18)Fee18, sum(Fee19)Fee19, sum(Fee20)Fee20, sum(Fee21)Fee21, sum(Fee22)Fee22, SUM(Fee23)Fee23, sum(Fee24)Fee24, SUM(Fee25)Fee25', "mid(period,1,4)='MISL' && User_Id LIKE '$collectioncounter' && Collection_Mode='$collectiontype' && RECT_DATE='$array_date[$i]'");
+				$data_array[] = $data1;
+			}
+
+			$array = array(
+				'data_array' => $data_array,
+				'feehead1'  => $feehead[1],
+				'feehead2'  => $feehead[2],
+				'feehead3'  => $feehead[3],
+				'feehead4'  => $feehead[4],
+				'feehead5'  => $feehead[5],
+				'feehead6'  => $feehead[6],
+				'feehead7'  => $feehead[7],
+				'feehead8'  => $feehead[8],
+				'feehead9'  => $feehead[9],
+				'feehead10' => $feehead[10],
+				'feehead11' => $feehead[11],
+				'feehead12' => $feehead[12],
+				'feehead13' => $feehead[13],
+				'feehead14' => $feehead[14],
+				'feehead15' => $feehead[15],
+				'feehead16' => $feehead[16],
+				'feehead17' => $feehead[17],
+				'feehead18' => $feehead[18],
+				'feehead19' => $feehead[19],
+				'feehead20' => $feehead[20],
+				'feehead21' => $feehead[21],
+				'feehead22' => $feehead[22],
+				'feehead23' => $feehead[23],
+				'feehead24' => $feehead[24],
+				'feehead25' => $feehead[25]
+			);
+			$this->load->view('Reports/monthly_collection_report', $array);
+		} else if ($feecollectiontype == 'NONE') {
+			$data_array = array();
+			for ($i = 0; $i < $count_date; $i++) {
+				$data1 = $this->dbcon->selectSingleData('daycoll', 'DISTINCT(RECT_DATE)AS RECT_DATE, min(RECT_NO) AS RECT_NO_start, MAX(RECT_NO) AS RECT_NO_end, sum(TOTAL) AS TOTAL, sum(Fee1) AS Fee1, SUM(Fee2) AS Fee2, SUM(Fee3)Fee3, sum(Fee4)Fee4, sum(Fee5)Fee5, sum(Fee6)Fee6, sum(Fee7)Fee7, sum(Fee8)Fee8, sum(Fee9)Fee9, sum(Fee10)Fee10, sum(Fee11)Fee11, SUM(Fee12)Fee12, sum(Fee13)Fee13, SUM(Fee14)Fee14, SUM(Fee15)Fee15, sum(Fee16)Fee16, sum(Fee17)Fee17, sum(Fee18)Fee18, sum(Fee19)Fee19, sum(Fee20)Fee20, sum(Fee21)Fee21, sum(Fee22)Fee22, SUM(Fee23)Fee23, sum(Fee24)Fee24, SUM(Fee25)Fee25', "ADM_NO='NONE' && User_Id LIKE '$collectioncounter' && Collection_Mode='$collectiontype' && RECT_DATE='$array_date[$i]'");
+				$data_array[] = $data1;
+			}
+
+			$array = array(
+				'data_array' => $data_array,
+				'feehead1'  => $feehead[1],
+				'feehead2'  => $feehead[2],
+				'feehead3'  => $feehead[3],
+				'feehead4'  => $feehead[4],
+				'feehead5'  => $feehead[5],
+				'feehead6'  => $feehead[6],
+				'feehead7'  => $feehead[7],
+				'feehead8'  => $feehead[8],
+				'feehead9'  => $feehead[9],
+				'feehead10' => $feehead[10],
+				'feehead11' => $feehead[11],
+				'feehead12' => $feehead[12],
+				'feehead13' => $feehead[13],
+				'feehead14' => $feehead[14],
+				'feehead15' => $feehead[15],
+				'feehead16' => $feehead[16],
+				'feehead17' => $feehead[17],
+				'feehead18' => $feehead[18],
+				'feehead19' => $feehead[19],
+				'feehead20' => $feehead[20],
+				'feehead21' => $feehead[21],
+				'feehead22' => $feehead[22],
+				'feehead23' => $feehead[23],
+				'feehead24' => $feehead[24],
+				'feehead25' => $feehead[25]
+			);
+			$this->load->view('Reports/monthly_collection_report', $array);
+		} else {
+			$data1 = "dada";
+		}
+	}
+	// function calling for the genetating pdf //
+	public function daily_report1()
+	{
+		ini_set('display_errors', -1);
+		ini_set('memory_limit', '1024M');
+		$collectiontype    = $this->input->post('ct1');
+		$feecollectiontype = $this->input->post('fct1');
+		$collectioncounter = $this->input->post('cc1');
+		$single			   = $this->input->post('sd1');
+		$date_type = $single;
+		for ($i = 1; $i <= 25; $i++) {
+			$feehead[$i] = $this->dbcon->select('feehead', '*', "ACT_CODE='$i'");
+		}
+		$School_setting = $this->dbcon->select('school_setting', '*');
+		$session_master = $this->dbcon->select('session_master', '*', "Active_Status=1");
+		$account = $this->dbcon->select('accg', '*');
+		if ($feecollectiontype == 'All') {
+
+			if ($collectioncounter == '%') {
+				$data1 = $this->dbcon->select('daycoll', '*', "Collection_Mode='$collectiontype' AND RECT_DATE='$date_type'");
+			} else {
+
+				$data1 = $this->dbcon->select('daycoll', '*', "User_Id LIKE '$collectioncounter' && Collection_Mode='$collectiontype' AND RECT_DATE='$date_type'");
+			}
+
+
+			$array = array(
+				'data1'     => $data1,
+				'feehead1'  => $feehead[1],
+				'feehead2'  => $feehead[2],
+				'feehead3'  => $feehead[3],
+				'feehead4'  => $feehead[4],
+				'feehead5'  => $feehead[5],
+				'feehead6'  => $feehead[6],
+				'feehead7'  => $feehead[7],
+				'feehead8'  => $feehead[8],
+				'feehead9'  => $feehead[9],
+				'feehead10' => $feehead[10],
+				'feehead11' => $feehead[11],
+				'feehead12' => $feehead[12],
+				'feehead13' => $feehead[13],
+				'feehead14' => $feehead[14],
+				'feehead15' => $feehead[15],
+				'feehead16' => $feehead[16],
+				'feehead17' => $feehead[17],
+				'feehead18' => $feehead[18],
+				'feehead19' => $feehead[19],
+				'feehead20' => $feehead[20],
+				'feehead21' => $feehead[21],
+				'feehead22' => $feehead[22],
+				'feehead23' => $feehead[23],
+				'feehead24' => $feehead[24],
+				'feehead25' => $feehead[25],
+				'School_setting' => $School_setting,
+				'feecollectiontype' => $feecollectiontype,
+				'collectioncounter' => $collectioncounter,
+				'account'	=> $account,
+				'CHQ_NO'	=> $CHQ_NO,  
+				'date_type' => $date_type
+			);
+			$this->load->view('Reports/daily_collection_pdf', $array);
+
+			$html = $this->output->get_output();
+			$this->load->library('pdf');
+			$this->dompdf->loadHtml($html);
+			$this->dompdf->set_option('isRemoteEnabled', true);
+			$this->dompdf->setPaper('A3', 'landscape');
+			$this->dompdf->render();
+			$this->dompdf->stream("daily_all_report.pdf", array("Attachment" => 0));
+		}
+		if ($feecollectiontype == 'PRE') {
+
+			if ($collectioncounter == '%') {
+				$data1 = $this->dbcon->select('previous_year_collection', '*', "Collection_Mode='$collectiontype' AND RECT_DATE='$date_type'");
+			} else {
+
+				$data1 = $this->dbcon->select('previous_year_collection', '*', "User_Id LIKE '$collectioncounter' && Collection_Mode='$collectiontype' AND RECT_DATE='$date_type'");
+			}
+
+
+			$array = array(
+				'data1'     => $data1,
+				'feehead1'  => $feehead[1],
+				'feehead2'  => $feehead[2],
+				'feehead3'  => $feehead[3],
+				'feehead4'  => $feehead[4],
+				'feehead5'  => $feehead[5],
+				'feehead6'  => $feehead[6],
+				'feehead7'  => $feehead[7],
+				'feehead8'  => $feehead[8],
+				'feehead9'  => $feehead[9],
+				'feehead10' => $feehead[10],
+				'feehead11' => $feehead[11],
+				'feehead12' => $feehead[12],
+				'feehead13' => $feehead[13],
+				'feehead14' => $feehead[14],
+				'feehead15' => $feehead[15],
+				'feehead16' => $feehead[16],
+				'feehead17' => $feehead[17],
+				'feehead18' => $feehead[18],
+				'feehead19' => $feehead[19],
+				'feehead20' => $feehead[20],
+				'feehead21' => $feehead[21],
+				'feehead22' => $feehead[22],
+				'feehead23' => $feehead[23],
+				'feehead24' => $feehead[24],
+				'feehead25' => $feehead[25],
+				'School_setting' => $School_setting,
+				'feecollectiontype' => $feecollectiontype,
+				'collectioncounter' => $collectioncounter,
+				'account'	=> $account,
+				'date_type' => $date_type
+			);
+			//echo $this->db->last_query();
+			//die;
+			$this->load->view('Reports/daily_collection_pdf', $array);
+
+			$html = $this->output->get_output();
+			$this->load->library('pdf');
+			$this->dompdf->loadHtml($html);
+			$this->dompdf->set_option('isRemoteEnabled', true);
+			$this->dompdf->setPaper('A3', 'landscape');
+			$this->dompdf->render();
+			$this->dompdf->stream("daily_pre_report.pdf", array("Attachment" => 0));
+		} else if ($feecollectiontype == 'Monthly') {
+			if ($collectioncounter == '%') {
+				$data1 = $this->dbcon->select('daycoll', '*', "ADM_NO!='NONE' && mid(period,1,4)!='MISL' && mid(period,1,3)!='PRE' && Collection_Mode='$collectiontype' && RECT_DATE='$date_type'");
+			} else {
+				$data1 = $this->dbcon->select('daycoll', '*', "ADM_NO!='NONE' && mid(period,1,4)!='MISL' && mid(period,1,3)!='PRE' && User_Id LIKE '$collectioncounter' && Collection_Mode='$collectiontype' && RECT_DATE='$date_type'");
+			}
+			$array = array(
+				'data1'     => $data1,
+				'feehead1'  => $feehead[1],
+				'feehead2'  => $feehead[2],
+				'feehead3'  => $feehead[3],
+				'feehead4'  => $feehead[4],
+				'feehead5'  => $feehead[5],
+				'feehead6'  => $feehead[6],
+				'feehead7'  => $feehead[7],
+				'feehead8'  => $feehead[8],
+				'feehead9'  => $feehead[9],
+				'feehead10' => $feehead[10],
+				'feehead11' => $feehead[11],
+				'feehead12' => $feehead[12],
+				'feehead13' => $feehead[13],
+				'feehead14' => $feehead[14],
+				'feehead15' => $feehead[15],
+				'feehead16' => $feehead[16],
+				'feehead17' => $feehead[17],
+				'feehead18' => $feehead[18],
+				'feehead19' => $feehead[19],
+				'feehead20' => $feehead[20],
+				'feehead21' => $feehead[21],
+				'feehead22' => $feehead[22],
+				'feehead23' => $feehead[23],
+				'feehead24' => $feehead[24],
+				'feehead25' => $feehead[25],
+				'School_setting' => $School_setting,
+				'feecollectiontype' => $feecollectiontype,
+				'collectioncounter' => $collectioncounter,
+				'account'	=> $account,
+				'date_type' => $date_type
+			);
+			$this->load->view('Reports/daily_collection_pdf', $array);
+
+			$html = $this->output->get_output();
+			$this->load->library('pdf');
+			$this->dompdf->loadHtml($html);
+			$this->dompdf->setPaper('A3', 'landscape');
+			$this->dompdf->render();
+			$this->dompdf->stream("Daily_Monthly.pdf", array("Attachment" => 0));
+		} else if ($feecollectiontype == 'MISL') {
+			$data1 = $this->dbcon->select('daycoll', '*', "mid(period,1,4)='MISL' && User_Id LIKE '$collectioncounter' && Collection_Mode='$collectiontype' && RECT_DATE='$date_type'");
+			$array = array(
+				'data1'     => $data1,
+				'feehead1'  => $feehead[1],
+				'feehead2'  => $feehead[2],
+				'feehead3'  => $feehead[3],
+				'feehead4'  => $feehead[4],
+				'feehead5'  => $feehead[5],
+				'feehead6'  => $feehead[6],
+				'feehead7'  => $feehead[7],
+				'feehead8'  => $feehead[8],
+				'feehead9'  => $feehead[9],
+				'feehead10' => $feehead[10],
+				'feehead11' => $feehead[11],
+				'feehead12' => $feehead[12],
+				'feehead13' => $feehead[13],
+				'feehead14' => $feehead[14],
+				'feehead15' => $feehead[15],
+				'feehead16' => $feehead[16],
+				'feehead17' => $feehead[17],
+				'feehead18' => $feehead[18],
+				'feehead19' => $feehead[19],
+				'feehead20' => $feehead[20],
+				'feehead21' => $feehead[21],
+				'feehead22' => $feehead[22],
+				'feehead23' => $feehead[23],
+				'feehead24' => $feehead[24],
+				'feehead25' => $feehead[25],
+				'School_setting' => $School_setting,
+				'feecollectiontype' => $feecollectiontype,
+				'collectioncounter' => $collectioncounter,
+				'account'	=> $account,
+				'date_type' => $date_type
+			);
+			$this->load->view('Reports/daily_collection_pdf', $array);
+
+			$html = $this->output->get_output();
+			$this->load->library('pdf');
+			$this->dompdf->loadHtml($html);
+			$this->dompdf->setPaper('A3', 'landscape');
+			$this->dompdf->render();
+			$this->dompdf->stream("Daily_Misl.pdf", array("Attachment" => 0));
+		} else if ($feecollectiontype == 'NONE') {
+			$data1 = $this->dbcon->select('daycoll', '*', "ADM_NO='NONE' && User_Id LIKE '$collectioncounter' && Collection_Mode='$collectiontype' && RECT_DATE='$date_type'");
+			$array = array(
+				'data1'     => $data1,
+				'feehead1'  => $feehead[1],
+				'feehead2'  => $feehead[2],
+				'feehead3'  => $feehead[3],
+				'feehead4'  => $feehead[4],
+				'feehead5'  => $feehead[5],
+				'feehead6'  => $feehead[6],
+				'feehead7'  => $feehead[7],
+				'feehead8'  => $feehead[8],
+				'feehead9'  => $feehead[9],
+				'feehead10' => $feehead[10],
+				'feehead11' => $feehead[11],
+				'feehead12' => $feehead[12],
+				'feehead13' => $feehead[13],
+				'feehead14' => $feehead[14],
+				'feehead15' => $feehead[15],
+				'feehead16' => $feehead[16],
+				'feehead17' => $feehead[17],
+				'feehead18' => $feehead[18],
+				'feehead19' => $feehead[19],
+				'feehead20' => $feehead[20],
+				'feehead21' => $feehead[21],
+				'feehead22' => $feehead[22],
+				'feehead23' => $feehead[23],
+				'feehead24' => $feehead[24],
+				'feehead25' => $feehead[25],
+				'School_setting' => $School_setting,
+				'feecollectiontype' => $feecollectiontype,
+				'collectioncounter' => $collectioncounter,
+				'account'	=> $account,
+				'date_type' => $date_type
+			);
+			$this->load->view('Reports/daily_collection_pdf', $array);
+
+			$html = $this->output->get_output();
+			$this->load->library('pdf');
+			$this->dompdf->loadHtml($html);
+			$this->dompdf->setPaper('A3', 'landscape');
+			$this->dompdf->render();
+			$this->dompdf->stream("Daily_None.pdf", array("Attachment" => 0));
+		} else {
+			$data1 = "dada";
+		}
+	}
+	public function daily_report()
+	{
+		ini_set('display_errors', -1);
+		ini_set('memory_limit', '1024M');
+		$collectiontype    = $this->input->post('ct1');
+		$feecollectiontype = $this->input->post('fct1');
+		$collectioncounter = $this->input->post('cc1');
+		$single			   = $this->input->post('sd1');
+		$date_type = $single;
+		for ($i = 1; $i <= 25; $i++) {
+			$feehead[$i] = $this->dbcon->select('feehead', '*', "ACT_CODE='$i'");
+		}
+		$School_setting = $this->dbcon->select('school_setting', '*');
+		$session_master = $this->dbcon->select('session_master', '*', "Active_Status=1");
+		$account = $this->dbcon->select('accg', '*');
+		if ($feecollectiontype == 'All') {
+			if ($collectioncounter == '%') {
+				if ($collectiontype == 1) {
+					$data1 = $this->dbcon->select('daycoll', '*', "Collection_Mode=$collectiontype AND RECT_DATE='$date_type' AND RECT_NO  like '%A%'");
+				} elseif ($collectiontype == 2) {
+					$data1 = $this->dbcon->select('daycoll', '*', "Collection_Mode=1 AND RECT_DATE='$date_type' AND RECT_NO  like '%D%'");
+				} else {
+					//$data1 = $this->dbcon->select('daycoll', '*', "Collection_Mode=$collectiontype AND RECT_DATE='$date_type' AND RECT_NO  like '%ON%'");
+					
+					$data1 = $this->db->query("SELECT * FROM `daycoll` WHERE `Collection_Mode` = 3 AND `RECT_DATE` = '$date_type' AND `RECT_NO` like '%ON%'  
+ORDER BY `daycoll`.`RECT_NO` ASC")->result();
+			//echo $this->db->last_query();die;
+				}
+			}
+			
+			else {
+
+				$data1 = $this->dbcon->select('daycoll', '*', "User_Id LIKE '$collectioncounter' && Collection_Mode='$collectiontype' AND RECT_DATE='$date_type'");
+			}
+
+
+			$array = array(
+				'data1'     => $data1,
+				'feehead1'  => $feehead[1],
+				'feehead2'  => $feehead[2],
+				'feehead3'  => $feehead[3],
+				'feehead4'  => $feehead[4],
+				'feehead5'  => $feehead[5],
+				'feehead6'  => $feehead[6],
+				'feehead7'  => $feehead[7],
+				'feehead8'  => $feehead[8],
+				'feehead9'  => $feehead[9],
+				'feehead10' => $feehead[10],
+				'feehead11' => $feehead[11],
+				'feehead12' => $feehead[12],
+				'feehead13' => $feehead[13],
+				'feehead14' => $feehead[14],
+				'feehead15' => $feehead[15],
+				'feehead16' => $feehead[16],
+				'feehead17' => $feehead[17],
+				'feehead18' => $feehead[18],
+				'feehead19' => $feehead[19],
+				'feehead20' => $feehead[20],
+				'feehead21' => $feehead[21],
+				'feehead22' => $feehead[22],
+				'feehead23' => $feehead[23],
+				'feehead24' => $feehead[24],
+				'feehead25' => $feehead[25],
+				'School_setting' => $School_setting,
+				'feecollectiontype' => $feecollectiontype,
+				'collectioncounter' => $collectioncounter,
+				'collectiontype'	=> $collectiontype,
+				'account'	=> $account,
+				'CHQ_NO'	=> $CHQ_NO,
+				'date_type' => $date_type
+			);
+			$this->load->view('Reports/daily_collection_pdf', $array);
+			$html = $this->output->get_output();
+			$this->load->library('pdf');
+			$this->dompdf->loadHtml($html);
+			$this->dompdf->set_option('isRemoteEnabled', true);
+			$this->dompdf->setPaper('A3', 'landscape');
+			$this->dompdf->render();
+			$this->dompdf->stream("daily_all_report.pdf", array("Attachment" => 0));
+		}
+		if ($feecollectiontype == 'PRE') {
+
+			if ($collectioncounter == '%') {
+				$data1 = $this->dbcon->select('previous_year_collection', '*', "Collection_Mode='$collectiontype' AND RECT_DATE='$date_type'");
+			} else {
+
+				$data1 = $this->dbcon->select('previous_year_collection', '*', "User_Id LIKE '$collectioncounter' && Collection_Mode='$collectiontype' AND RECT_DATE='$date_type'");
+			}
+
+
+			$array = array(
+				'data1'     => $data1,
+				'feehead1'  => $feehead[1],
+				'feehead2'  => $feehead[2],
+				'feehead3'  => $feehead[3],
+				'feehead4'  => $feehead[4],
+				'feehead5'  => $feehead[5],
+				'feehead6'  => $feehead[6],
+				'feehead7'  => $feehead[7],
+				'feehead8'  => $feehead[8],
+				'feehead9'  => $feehead[9],
+				'feehead10' => $feehead[10],
+				'feehead11' => $feehead[11],
+				'feehead12' => $feehead[12],
+				'feehead13' => $feehead[13],
+				'feehead14' => $feehead[14],
+				'feehead15' => $feehead[15],
+				'feehead16' => $feehead[16],
+				'feehead17' => $feehead[17],
+				'feehead18' => $feehead[18],
+				'feehead19' => $feehead[19],
+				'feehead20' => $feehead[20],
+				'feehead21' => $feehead[21],
+				'feehead22' => $feehead[22],
+				'feehead23' => $feehead[23],
+				'feehead24' => $feehead[24],
+				'feehead25' => $feehead[25],
+				'School_setting' => $School_setting,
+				'feecollectiontype' => $feecollectiontype,
+				'collectiontype'	=> $collectiontype,
+				'collectioncounter' => $collectioncounter,
+				'account'	=> $account,
+				'date_type' => $date_type
+			);
+			$this->load->view('Reports/daily_collection_pdf', $array);
+
+			$html = $this->output->get_output();
+			$this->load->library('pdf');
+			$this->dompdf->loadHtml($html);
+			$this->dompdf->set_option('isRemoteEnabled', true);
+			$this->dompdf->setPaper('A3', 'landscape');
+			$this->dompdf->render();
+			$this->dompdf->stream("daily_pre_report.pdf", array("Attachment" => 0));
+		} else if ($feecollectiontype == 'Monthly') {
+			if ($collectioncounter == '%') {
+				$data1 = $this->dbcon->select('daycoll', '*', "ADM_NO!='NONE' && mid(period,1,4)!='MISL' && mid(period,1,3)!='PRE' && Collection_Mode='$collectiontype' && RECT_DATE='$date_type'");
+			} else {
+				$data1 = $this->dbcon->select('daycoll', '*', "ADM_NO!='NONE' && mid(period,1,4)!='MISL' && mid(period,1,3)!='PRE' && User_Id LIKE '$collectioncounter' && Collection_Mode='$collectiontype' && RECT_DATE='$date_type'");
+			}
+			$array = array(
+				'data1'     => $data1,
+				'feehead1'  => $feehead[1],
+				'feehead2'  => $feehead[2],
+				'feehead3'  => $feehead[3],
+				'feehead4'  => $feehead[4],
+				'feehead5'  => $feehead[5],
+				'feehead6'  => $feehead[6],
+				'feehead7'  => $feehead[7],
+				'feehead8'  => $feehead[8],
+				'feehead9'  => $feehead[9],
+				'feehead10' => $feehead[10],
+				'feehead11' => $feehead[11],
+				'feehead12' => $feehead[12],
+				'feehead13' => $feehead[13],
+				'feehead14' => $feehead[14],
+				'feehead15' => $feehead[15],
+				'feehead16' => $feehead[16],
+				'feehead17' => $feehead[17],
+				'feehead18' => $feehead[18],
+				'feehead19' => $feehead[19],
+				'feehead20' => $feehead[20],
+				'feehead21' => $feehead[21],
+				'feehead22' => $feehead[22],
+				'feehead23' => $feehead[23],
+				'feehead24' => $feehead[24],
+				'feehead25' => $feehead[25],
+				'School_setting' => $School_setting,
+				'feecollectiontype' => $feecollectiontype,
+				'collectiontype'	=> $collectiontype,
+				'collectioncounter' => $collectioncounter,
+				'account'	=> $account,
+				'date_type' => $date_type
+			);
+			$this->load->view('Reports/daily_collection_pdf', $array);
+
+			$html = $this->output->get_output();
+			$this->load->library('pdf');
+			$this->dompdf->loadHtml($html);
+			$this->dompdf->setPaper('A3', 'landscape');
+			$this->dompdf->render();
+			$this->dompdf->stream("Daily_Monthly.pdf", array("Attachment" => 0));
+		} else if ($feecollectiontype == 'MISL') {
+			$data1 = $this->dbcon->select('daycoll', '*', "mid(period,1,4)='MISL' && User_Id LIKE '$collectioncounter' && Collection_Mode='$collectiontype' && RECT_DATE='$date_type'");
+			$array = array(
+				'data1'     => $data1,
+				'feehead1'  => $feehead[1],
+				'feehead2'  => $feehead[2],
+				'feehead3'  => $feehead[3],
+				'feehead4'  => $feehead[4],
+				'feehead5'  => $feehead[5],
+				'feehead6'  => $feehead[6],
+				'feehead7'  => $feehead[7],
+				'feehead8'  => $feehead[8],
+				'feehead9'  => $feehead[9],
+				'feehead10' => $feehead[10],
+				'feehead11' => $feehead[11],
+				'feehead12' => $feehead[12],
+				'feehead13' => $feehead[13],
+				'feehead14' => $feehead[14],
+				'feehead15' => $feehead[15],
+				'feehead16' => $feehead[16],
+				'feehead17' => $feehead[17],
+				'feehead18' => $feehead[18],
+				'feehead19' => $feehead[19],
+				'feehead20' => $feehead[20],
+				'feehead21' => $feehead[21],
+				'feehead22' => $feehead[22],
+				'feehead23' => $feehead[23],
+				'feehead24' => $feehead[24],
+				'feehead25' => $feehead[25],
+				'School_setting' => $School_setting,
+				'feecollectiontype' => $feecollectiontype,
+				'collectiontype'	=> $collectiontype,
+				'collectioncounter' => $collectioncounter,
+				'account'	=> $account,
+				'date_type' => $date_type
+			);
+			$this->load->view('Reports/daily_collection_pdf', $array);
+
+			$html = $this->output->get_output();
+			$this->load->library('pdf');
+			$this->dompdf->loadHtml($html);
+			$this->dompdf->setPaper('A3', 'landscape');
+			$this->dompdf->render();
+			$this->dompdf->stream("Daily_Misl.pdf", array("Attachment" => 0));
+		} else if ($feecollectiontype == 'NONE') {
+			$data1 = $this->dbcon->select('daycoll', '*', "ADM_NO='NONE' && User_Id LIKE '$collectioncounter' && Collection_Mode='$collectiontype' && RECT_DATE='$date_type'");
+			$array = array(
+				'data1'     => $data1,
+				'feehead1'  => $feehead[1],
+				'feehead2'  => $feehead[2],
+				'feehead3'  => $feehead[3],
+				'feehead4'  => $feehead[4],
+				'feehead5'  => $feehead[5],
+				'feehead6'  => $feehead[6],
+				'feehead7'  => $feehead[7],
+				'feehead8'  => $feehead[8],
+				'feehead9'  => $feehead[9],
+				'feehead10' => $feehead[10],
+				'feehead11' => $feehead[11],
+				'feehead12' => $feehead[12],
+				'feehead13' => $feehead[13],
+				'feehead14' => $feehead[14],
+				'feehead15' => $feehead[15],
+				'feehead16' => $feehead[16],
+				'feehead17' => $feehead[17],
+				'feehead18' => $feehead[18],
+				'feehead19' => $feehead[19],
+				'feehead20' => $feehead[20],
+				'feehead21' => $feehead[21],
+				'feehead22' => $feehead[22],
+				'feehead23' => $feehead[23],
+				'feehead24' => $feehead[24],
+				'feehead25' => $feehead[25],
+				'School_setting' => $School_setting,
+				'feecollectiontype' => $feecollectiontype,
+				'collectiontype'	=> $collectiontype,
+				'collectioncounter' => $collectioncounter,
+				'account'	=> $account,
+				'date_type' => $date_type
+			);
+			$this->load->view('Reports/daily_collection_pdf', $array);
+
+			$html = $this->output->get_output();
+			$this->load->library('pdf');
+			$this->dompdf->loadHtml($html);
+			$this->dompdf->setPaper('A3', 'landscape');
+			$this->dompdf->render();
+			$this->dompdf->stream("Daily_None.pdf", array("Attachment" => 0));
+		} else {
+			$data1 = "dada";
+		}
+	}
+	public function monthly_report()
+	{
+		//echo "<pre>";print_r($_POST);die;
+		ini_set('display_errors', -1);
+		$collectiontype    = $this->input->post('ct2');
+		$feecollectiontype = $this->input->post('fct2');
+		$collectioncounter = $this->input->post('cc2');
+		$single			   = $this->input->post('sd2');
+		$double			   = $this->input->post('sdf2');
+
+		// Declare an empty array 
+		$array_date = array();
+
+		// Use strtotime function 
+		$Variable1 = strtotime($single);
+		$Variable2 = strtotime($double);
+
+		// Use for loop to store dates into array 
+		// 86400 sec = 24 hrs = 60*60*24 = 1 day 
+		for (
+			$currentDate = $Variable1;
+			$currentDate <= $Variable2;
+			$currentDate += (86400)
+		) {
+
+			$Store = date('Y-m-d', $currentDate);
+			$array_date[] = $Store;
+		}
+		$count_date = count($array_date);
+
+		for ($i = 1; $i <= 25; $i++) {
+			$feehead[$i] = $this->dbcon->select('feehead', '*', "ACT_CODE='$i'");
+		}
+		$School_setting = $this->dbcon->select('school_setting', '*');
+		$session_master = $this->dbcon->select('session_master', '*', "Active_Status=1");
+		$account = $this->dbcon->select('accg', '*');
+		if ($feecollectiontype == 'All') {
+			$data_array = array();
+			for ($i = 0; $i < $count_date; $i++) {
+				
+				if ($collectioncounter == '%') {
+					if ($collectiontype == 2) {
+						$data1 = $this->dbcon->selectSingleData('daycoll', 'DISTINCT(RECT_DATE)AS RECT_DATE, min(RECT_NO) AS RECT_NO_start, MAX(RECT_NO) AS RECT_NO_end, sum(TOTAL) AS TOTAL, sum(Fee1) AS Fee1, SUM(Fee2) AS Fee2, SUM(Fee3)Fee3, sum(Fee4)Fee4, sum(Fee5)Fee5, sum(Fee6)Fee6, sum(Fee7)Fee7, sum(Fee8)Fee8, sum(Fee9)Fee9, sum(Fee10)Fee10, sum(Fee11)Fee11, SUM(Fee12)Fee12, sum(Fee13)Fee13, SUM(Fee14)Fee14, SUM(Fee15)Fee15, sum(Fee16)Fee16, sum(Fee17)Fee17, sum(Fee18)Fee18, sum(Fee19)Fee19, sum(Fee20)Fee20, sum(Fee21)Fee21, sum(Fee22)Fee22, SUM(Fee23)Fee23, sum(Fee24)Fee24, SUM(Fee25)Fee25 ,SUM(PAID_AMOUNT)PAID_AMOUNT,SUM(SHORT_AMOUNT)SHORT_AMOUNT,SUM(Recovered_Short_Amt)Recovered_Short_Amt', "Collection_Mode=1 AND RECT_DATE ='$array_date[$i]' AND RECT_NO LIKE 'D%'");
+						$data_array[] = $data1;
+					} elseif ($collectiontype == 3) {
+						$data1 = $this->dbcon->selectSingleData('daycoll', 'DISTINCT(RECT_DATE)AS RECT_DATE, min(RECT_NO) AS RECT_NO_start, MAX(RECT_NO) AS RECT_NO_end, sum(TOTAL) AS TOTAL, sum(Fee1) AS Fee1, SUM(Fee2) AS Fee2, SUM(Fee3)Fee3, sum(Fee4)Fee4, sum(Fee5)Fee5, sum(Fee6)Fee6, sum(Fee7)Fee7, sum(Fee8)Fee8, sum(Fee9)Fee9, sum(Fee10)Fee10, sum(Fee11)Fee11, SUM(Fee12)Fee12, sum(Fee13)Fee13, SUM(Fee14)Fee14, SUM(Fee15)Fee15, sum(Fee16)Fee16, sum(Fee17)Fee17, sum(Fee18)Fee18, sum(Fee19)Fee19, sum(Fee20)Fee20, sum(Fee21)Fee21, sum(Fee22)Fee22, SUM(Fee23)Fee23, sum(Fee24)Fee24, SUM(Fee25)Fee25 ,SUM(PAID_AMOUNT)PAID_AMOUNT,SUM(SHORT_AMOUNT)SHORT_AMOUNT,SUM(Recovered_Short_Amt)Recovered_Short_Amt', "Collection_Mode=$collectiontype AND RECT_DATE='$array_date[$i]' AND RECT_NO LIKE '%ON%'");
+						$data_array[] = $data1;
+					} else {
+						$data1 = $this->dbcon->selectSingleData('daycoll', 'DISTINCT(RECT_DATE)AS RECT_DATE, min(RECT_NO) AS RECT_NO_start, MAX(RECT_NO) AS RECT_NO_end, sum(TOTAL) AS TOTAL, sum(Fee1) AS Fee1, SUM(Fee2) AS Fee2, SUM(Fee3)Fee3, sum(Fee4)Fee4, sum(Fee5)Fee5, sum(Fee6)Fee6, sum(Fee7)Fee7, sum(Fee8)Fee8, sum(Fee9)Fee9, sum(Fee10)Fee10, sum(Fee11)Fee11, SUM(Fee12)Fee12, sum(Fee13)Fee13, SUM(Fee14)Fee14, SUM(Fee15)Fee15, sum(Fee16)Fee16, sum(Fee17)Fee17, sum(Fee18)Fee18, sum(Fee19)Fee19, sum(Fee20)Fee20, sum(Fee21)Fee21, sum(Fee22)Fee22, SUM(Fee23)Fee23, sum(Fee24)Fee24, SUM(Fee25)Fee25 ,SUM(PAID_AMOUNT)PAID_AMOUNT,SUM(SHORT_AMOUNT)SHORT_AMOUNT,SUM(Recovered_Short_Amt)Recovered_Short_Amt', "Collection_Mode=$collectiontype AND RECT_DATE='$array_date[$i]'AND RECT_NO LIKE 'A%'");
+						$data_array[] = $data1;
+					}
+				} 
+				
+				
+				else {
+					$data1 = $this->dbcon->selectSingleData('daycoll', 'DISTINCT(RECT_DATE)AS RECT_DATE, min(RECT_NO) AS RECT_NO_start, MAX(RECT_NO) AS RECT_NO_end, sum(TOTAL) AS TOTAL, sum(Fee1) AS Fee1, SUM(Fee2) AS Fee2, SUM(Fee3)Fee3, sum(Fee4)Fee4, sum(Fee5)Fee5, sum(Fee6)Fee6, sum(Fee7)Fee7, sum(Fee8)Fee8, sum(Fee9)Fee9, sum(Fee10)Fee10, sum(Fee11)Fee11, SUM(Fee12)Fee12, sum(Fee13)Fee13, SUM(Fee14)Fee14, SUM(Fee15)Fee15, sum(Fee16)Fee16, sum(Fee17)Fee17, sum(Fee18)Fee18, sum(Fee19)Fee19, sum(Fee20)Fee20, sum(Fee21)Fee21, sum(Fee22)Fee22, SUM(Fee23)Fee23, sum(Fee24)Fee24, SUM(Fee25)Fee25 ,SUM(PAID_AMOUNT)PAID_AMOUNT ,SUM(SHORT_AMOUNT)SHORT_AMOUNT,SUM(Recovered_Short_Amt)Recovered_Short_Amt', "User_Id LIKE '$collectioncounter' && Collection_Mode=$collectiontype AND RECT_DATE='$array_date[$i]'");
+					// echo $this->db->last_query();die;
+					$data_array[] = $data1;
+				}
+			}
+
+		if($collectiontype == 2){
+				$collection_type = $this->dbcon->select('daycoll', '*', "Collection_Mode=1 AND RECT_DATE>='$single' AND RECT_DATE<='$double' AND Payment_Mode='NEFT'");
+			}else{
+				$collection_type = $this->dbcon->select('daycoll', '*', "Collection_Mode=$collectiontype AND RECT_DATE>='$single' AND RECT_DATE<='$double' AND Payment_Mode<>'NEFT'");
+			}
+
+			$array = array(
+				'data_array' => $data_array,
+				'feehead1'  => $feehead[1],
+				'feehead2'  => $feehead[2],
+				'feehead3'  => $feehead[3],
+				'feehead4'  => $feehead[4],
+				'feehead5'  => $feehead[5],
+				'feehead6'  => $feehead[6],
+				'feehead7'  => $feehead[7],
+				'feehead8'  => $feehead[8],
+				'feehead9'  => $feehead[9],
+				'feehead10' => $feehead[10],
+				'feehead11' => $feehead[11],
+				'feehead12' => $feehead[12],
+				'feehead13' => $feehead[13],
+				'feehead14' => $feehead[14],
+				'feehead15' => $feehead[15],
+				'feehead16' => $feehead[16],
+				'feehead17' => $feehead[17],
+				'feehead18' => $feehead[18],
+				'feehead19' => $feehead[19],
+				'feehead20' => $feehead[20],
+				'feehead21' => $feehead[21],
+				'feehead22' => $feehead[22],
+				'feehead23' => $feehead[23],
+				'feehead24' => $feehead[24],
+				'feehead25' => $feehead[25],
+				'fromdate'  => $single,
+				'todate'    => $double,
+				'School_setting' => $School_setting,
+				'feecollectiontype' => $feecollectiontype,
+				'collectioncounter' => $collectioncounter,
+				'collectiontype'	=> $collectiontype,
+				'account'	=> $account,
+				'collection_type' => $collection_type
+			);
+			// echo '<pre>';
+			// print_r($data_array);
+			// die;
+			$this->load->view('Reports/monthly_collection_pdf', $array);
+
+			$html = $this->output->get_output();
+			$this->load->library('pdf');
+			$this->dompdf->loadHtml($html);
+			$this->dompdf->setPaper('A3', 'landscape');
+			$this->dompdf->render();
+			$this->dompdf->stream("Monthly_report_all.pdf", array("Attachment" => 0));
+		}
+		if ($feecollectiontype == 'PRE') {
+			$data_array = array();
+			for ($i = 0; $i < $count_date; $i++) {
+				if ($collectioncounter == '%') {
+					$data1 = $this->dbcon->selectSingleData('previous_year_collection', 'DISTINCT(RECT_DATE)AS RECT_DATE, min(RECT_NO) AS RECT_NO_start, MAX(RECT_NO) AS RECT_NO_end, sum(TOTAL) AS TOTAL, sum(Fee1) AS Fee1, SUM(Fee2) AS Fee2, SUM(Fee3)Fee3, sum(Fee4)Fee4, sum(Fee5)Fee5, sum(Fee6)Fee6, sum(Fee7)Fee7, sum(Fee8)Fee8, sum(Fee9)Fee9, sum(Fee10)Fee10, sum(Fee11)Fee11, SUM(Fee12)Fee12, sum(Fee13)Fee13, SUM(Fee14)Fee14, SUM(Fee15)Fee15, sum(Fee16)Fee16, sum(Fee17)Fee17, sum(Fee18)Fee18, sum(Fee19)Fee19, sum(Fee20)Fee20, sum(Fee21)Fee21, sum(Fee22)Fee22, SUM(Fee23)Fee23, sum(Fee24)Fee24, SUM(Fee25)Fee25', "Collection_Mode=$collectiontype AND RECT_DATE='$array_date[$i]'");
+					$data_array[] = $data1;
+				} else {
+
+					$data1 = $this->dbcon->selectSingleData('previous_year_collection', 'DISTINCT(RECT_DATE)AS RECT_DATE, min(RECT_NO) AS RECT_NO_start, MAX(RECT_NO) AS RECT_NO_end, sum(TOTAL) AS TOTAL, sum(Fee1) AS Fee1, SUM(Fee2) AS Fee2, SUM(Fee3)Fee3, sum(Fee4)Fee4, sum(Fee5)Fee5, sum(Fee6)Fee6, sum(Fee7)Fee7, sum(Fee8)Fee8, sum(Fee9)Fee9, sum(Fee10)Fee10, sum(Fee11)Fee11, SUM(Fee12)Fee12, sum(Fee13)Fee13, SUM(Fee14)Fee14, SUM(Fee15)Fee15, sum(Fee16)Fee16, sum(Fee17)Fee17, sum(Fee18)Fee18, sum(Fee19)Fee19, sum(Fee20)Fee20, sum(Fee21)Fee21, sum(Fee22)Fee22, SUM(Fee23)Fee23, sum(Fee24)Fee24, SUM(Fee25)Fee25', "User_Id LIKE '$collectioncounter' && Collection_Mode=$collectiontype AND RECT_DATE='$array_date[$i]'");
+					$data_array[] = $data1;
+				}
+			}
+			$collection_type = $this->dbcon->select('previous_year_collection', '*', "Collection_Mode=$collectiontype AND RECT_DATE>='$single' AND RECT_DATE<='$double'");
+
+			$array = array(
+				'data_array' => $data_array,
+				'feehead1'  => $feehead[1],
+				'feehead2'  => $feehead[2],
+				'feehead3'  => $feehead[3],
+				'feehead4'  => $feehead[4],
+				'feehead5'  => $feehead[5],
+				'feehead6'  => $feehead[6],
+				'feehead7'  => $feehead[7],
+				'feehead8'  => $feehead[8],
+				'feehead9'  => $feehead[9],
+				'feehead10' => $feehead[10],
+				'feehead11' => $feehead[11],
+				'feehead12' => $feehead[12],
+				'feehead13' => $feehead[13],
+				'feehead14' => $feehead[14],
+				'feehead15' => $feehead[15],
+				'feehead16' => $feehead[16],
+				'feehead17' => $feehead[17],
+				'feehead18' => $feehead[18],
+				'feehead19' => $feehead[19],
+				'feehead20' => $feehead[20],
+				'feehead21' => $feehead[21],
+				'feehead22' => $feehead[22],
+				'feehead23' => $feehead[23],
+				'feehead24' => $feehead[24],
+				'feehead25' => $feehead[25],
+				'fromdate'  => $single,
+				'todate'    => $double,
+				'School_setting' => $School_setting,
+				'feecollectiontype' => $feecollectiontype,
+				'collectiontype'	=> $collectiontype,
+				'collectioncounter' => $collectioncounter,
+				'account'	=> $account,
+				'collection_type' => $collection_type
+			);
+			$this->load->view('Reports/monthly_collection_pdf', $array);
+
+			$html = $this->output->get_output();
+			$this->load->library('pdf');
+			$this->dompdf->loadHtml($html);
+			$this->dompdf->setPaper('A3', 'landscape');
+			$this->dompdf->render();
+			$this->dompdf->stream("Monthly_report_all.pdf", array("Attachment" => 0));
+		} else if ($feecollectiontype == 'Monthly') {
+			$data_array = array();
+			for ($i = 0; $i < $count_date; $i++) {
+				if ($collectioncounter == '%') {
+					$data1 = $this->dbcon->selectSingleData('daycoll', 'DISTINCT(RECT_DATE)AS RECT_DATE, min(RECT_NO) AS RECT_NO_start, MAX(RECT_NO) AS RECT_NO_end, sum(TOTAL) AS TOTAL, sum(Fee1) AS Fee1, SUM(Fee2) AS Fee2, SUM(Fee3)Fee3, sum(Fee4)Fee4, sum(Fee5)Fee5, sum(Fee6)Fee6, sum(Fee7)Fee7, sum(Fee8)Fee8, sum(Fee9)Fee9, sum(Fee10)Fee10, sum(Fee11)Fee11, SUM(Fee12)Fee12, sum(Fee13)Fee13, SUM(Fee14)Fee14, SUM(Fee15)Fee15, sum(Fee16)Fee16, sum(Fee17)Fee17, sum(Fee18)Fee18, sum(Fee19)Fee19, sum(Fee20)Fee20, sum(Fee21)Fee21, sum(Fee22)Fee22, SUM(Fee23)Fee23, sum(Fee24)Fee24, SUM(Fee25)Fee25', "ADM_NO!='NONE' && mid(period,1,4)!='MISL' && mid(period,1,3)!='PRE' && Collection_Mode='$collectiontype' && RECT_DATE='$array_date[$i]'");
+					$data_array[] = $data1;
+				} else {
+					$data1 = $this->dbcon->selectSingleData('daycoll', 'DISTINCT(RECT_DATE)AS RECT_DATE, min(RECT_NO) AS RECT_NO_start, MAX(RECT_NO) AS RECT_NO_end, sum(TOTAL) AS TOTAL, sum(Fee1) AS Fee1, SUM(Fee2) AS Fee2, SUM(Fee3)Fee3, sum(Fee4)Fee4, sum(Fee5)Fee5, sum(Fee6)Fee6, sum(Fee7)Fee7, sum(Fee8)Fee8, sum(Fee9)Fee9, sum(Fee10)Fee10, sum(Fee11)Fee11, SUM(Fee12)Fee12, sum(Fee13)Fee13, SUM(Fee14)Fee14, SUM(Fee15)Fee15, sum(Fee16)Fee16, sum(Fee17)Fee17, sum(Fee18)Fee18, sum(Fee19)Fee19, sum(Fee20)Fee20, sum(Fee21)Fee21, sum(Fee22)Fee22, SUM(Fee23)Fee23, sum(Fee24)Fee24, SUM(Fee25)Fee25', "ADM_NO!='NONE' && mid(period,1,4)!='MISL' && mid(period,1,3)!='PRE' && User_Id LIKE '$collectioncounter' && Collection_Mode='$collectiontype' && RECT_DATE='$array_date[$i]'");
+					$data_array[] = $data1;
+				}
+			}
+			if ($collectioncounter == '%') {
+				$collection_type = $this->dbcon->select('daycoll', '*', "ADM_NO!='NONE' && mid(period,1,4)!='MISL' && mid(period,1,3)!='PRE' && Collection_Mode='$collectiontype' && RECT_DATE>='$single' AND RECT_DATE<='$double'");
+			} else {
+				$collection_type = $this->dbcon->select('daycoll', '*', "ADM_NO!='NONE' && mid(period,1,4)!='MISL' && mid(period,1,3)!='PRE' && User_Id LIKE '$collectioncounter' && Collection_Mode='$collectiontype' && RECT_DATE>='$single' AND RECT_DATE<='$double'");
+			}
+			$array = array(
+				'data_array' => $data_array,
+				'feehead1'  => $feehead[1],
+				'feehead2'  => $feehead[2],
+				'feehead3'  => $feehead[3],
+				'feehead4'  => $feehead[4],
+				'feehead5'  => $feehead[5],
+				'feehead6'  => $feehead[6],
+				'feehead7'  => $feehead[7],
+				'feehead8'  => $feehead[8],
+				'feehead9'  => $feehead[9],
+				'feehead10' => $feehead[10],
+				'feehead11' => $feehead[11],
+				'feehead12' => $feehead[12],
+				'feehead13' => $feehead[13],
+				'feehead14' => $feehead[14],
+				'feehead15' => $feehead[15],
+				'feehead16' => $feehead[16],
+				'feehead17' => $feehead[17],
+				'feehead18' => $feehead[18],
+				'feehead19' => $feehead[19],
+				'feehead20' => $feehead[20],
+				'feehead21' => $feehead[21],
+				'feehead22' => $feehead[22],
+				'feehead23' => $feehead[23],
+				'feehead24' => $feehead[24],
+				'feehead25' => $feehead[25],
+				'fromdate'  => $single,
+				'todate'    => $double,
+				'School_setting' => $School_setting,
+				'feecollectiontype' => $feecollectiontype,
+				'collectioncounter' => $collectioncounter,
+				'collectiontype'	=> $collectiontype,
+				'account'	=> $account,
+				'collection_type' => $collection_type
+			);
+			$this->load->view('Reports/monthly_collection_pdf', $array);
+
+			$html = $this->output->get_output();
+			$this->load->library('pdf');
+			$this->dompdf->loadHtml($html);
+			$this->dompdf->setPaper('A3', 'landscape');
+			$this->dompdf->render();
+			$this->dompdf->stream("Monthly_Reports.pdf", array("Attachment" => 0));
+		} else if ($feecollectiontype == 'MISL') {
+			$data_array = array();
+			for ($i = 0; $i < $count_date; $i++) {
+				$data1 = $this->dbcon->selectSingleData('daycoll', 'DISTINCT(RECT_DATE)AS RECT_DATE, min(RECT_NO) AS RECT_NO_start, MAX(RECT_NO) AS RECT_NO_end, sum(TOTAL) AS TOTAL, sum(Fee1) AS Fee1, SUM(Fee2) AS Fee2, SUM(Fee3)Fee3, sum(Fee4)Fee4, sum(Fee5)Fee5, sum(Fee6)Fee6, sum(Fee7)Fee7, sum(Fee8)Fee8, sum(Fee9)Fee9, sum(Fee10)Fee10, sum(Fee11)Fee11, SUM(Fee12)Fee12, sum(Fee13)Fee13, SUM(Fee14)Fee14, SUM(Fee15)Fee15, sum(Fee16)Fee16, sum(Fee17)Fee17, sum(Fee18)Fee18, sum(Fee19)Fee19, sum(Fee20)Fee20, sum(Fee21)Fee21, sum(Fee22)Fee22, SUM(Fee23)Fee23, sum(Fee24)Fee24, SUM(Fee25)Fee25', "mid(period,1,4)='MISL' && User_Id LIKE '$collectioncounter' && Collection_Mode='$collectiontype' && RECT_DATE='$array_date[$i]'");
+				$data_array[] = $data1;
+			}
+			$collection_type = $this->dbcon->select('daycoll', '*', "mid(period,1,4)='MISL' && User_Id LIKE '$collectioncounter' && Collection_Mode='$collectiontype' && RECT_DATE>='$single' AND RECT_DATE<='$double'");
+			$array = array(
+				'data_array'     => $data_array,
+				'feehead1'  => $feehead[1],
+				'feehead2'  => $feehead[2],
+				'feehead3'  => $feehead[3],
+				'feehead4'  => $feehead[4],
+				'feehead5'  => $feehead[5],
+				'feehead6'  => $feehead[6],
+				'feehead7'  => $feehead[7],
+				'feehead8'  => $feehead[8],
+				'feehead9'  => $feehead[9],
+				'feehead10' => $feehead[10],
+				'feehead11' => $feehead[11],
+				'feehead12' => $feehead[12],
+				'feehead13' => $feehead[13],
+				'feehead14' => $feehead[14],
+				'feehead15' => $feehead[15],
+				'feehead16' => $feehead[16],
+				'feehead17' => $feehead[17],
+				'feehead18' => $feehead[18],
+				'feehead19' => $feehead[19],
+				'feehead20' => $feehead[20],
+				'feehead21' => $feehead[21],
+				'feehead22' => $feehead[22],
+				'feehead23' => $feehead[23],
+				'feehead24' => $feehead[24],
+				'feehead25' => $feehead[25],
+				'fromdate'  => $single,
+				'todate'    => $double,
+				'School_setting' => $School_setting,
+				'feecollectiontype' => $feecollectiontype,
+				'collectioncounter' => $collectioncounter,
+				'collectiontype'	=> $collectiontype,
+				'account'	=> $account,
+				'collection_type' => $collection_type
+			);
+			$this->load->view('Reports/monthly_collection_pdf', $array);
+
+			$html = $this->output->get_output();
+			$this->load->library('pdf');
+			$this->dompdf->loadHtml($html);
+			$this->dompdf->setPaper('A3', 'landscape');
+			$this->dompdf->render();
+			$this->dompdf->stream("Monthly_Misl.pdf", array("Attachment" => 0));
+		} else if ($feecollectiontype == 'NONE') {
+			$data_array = array();
+			for ($i = 0; $i < $count_date; $i++) {
+				$data1 = $this->dbcon->selectSingleData('daycoll', 'DISTINCT(RECT_DATE)AS RECT_DATE, min(RECT_NO) AS RECT_NO_start, MAX(RECT_NO) AS RECT_NO_end, sum(TOTAL) AS TOTAL, sum(Fee1) AS Fee1, SUM(Fee2) AS Fee2, SUM(Fee3)Fee3, sum(Fee4)Fee4, sum(Fee5)Fee5, sum(Fee6)Fee6, sum(Fee7)Fee7, sum(Fee8)Fee8, sum(Fee9)Fee9, sum(Fee10)Fee10, sum(Fee11)Fee11, SUM(Fee12)Fee12, sum(Fee13)Fee13, SUM(Fee14)Fee14, SUM(Fee15)Fee15, sum(Fee16)Fee16, sum(Fee17)Fee17, sum(Fee18)Fee18, sum(Fee19)Fee19, sum(Fee20)Fee20, sum(Fee21)Fee21, sum(Fee22)Fee22, SUM(Fee23)Fee23, sum(Fee24)Fee24, SUM(Fee25)Fee25', "ADM_NO='NONE' && User_Id LIKE '$collectioncounter' && Collection_Mode='$collectiontype' && RECT_DATE='$array_date[$i]'");
+				$data_array[] = $data1;
+			}
+			$collection_type = $this->dbcon->select('daycoll', '*', "ADM_NO='NONE' && User_Id LIKE '$collectioncounter' && Collection_Mode='$collectiontype' && RECT_DATE>='$single' AND RECT_DATE<='$double'");
+			$array = array(
+				'data_array' => $data_array,
+				'feehead1'  => $feehead[1],
+				'feehead2'  => $feehead[2],
+				'feehead3'  => $feehead[3],
+				'feehead4'  => $feehead[4],
+				'feehead5'  => $feehead[5],
+				'feehead6'  => $feehead[6],
+				'feehead7'  => $feehead[7],
+				'feehead8'  => $feehead[8],
+				'feehead9'  => $feehead[9],
+				'feehead10' => $feehead[10],
+				'feehead11' => $feehead[11],
+				'feehead12' => $feehead[12],
+				'feehead13' => $feehead[13],
+				'feehead14' => $feehead[14],
+				'feehead15' => $feehead[15],
+				'feehead16' => $feehead[16],
+				'feehead17' => $feehead[17],
+				'feehead18' => $feehead[18],
+				'feehead19' => $feehead[19],
+				'feehead20' => $feehead[20],
+				'feehead21' => $feehead[21],
+				'feehead22' => $feehead[22],
+				'feehead23' => $feehead[23],
+				'feehead24' => $feehead[24],
+				'feehead25' => $feehead[25],
+				'fromdate'  => $single,
+				'todate'    => $double,
+				'School_setting' => $School_setting,
+				'feecollectiontype' => $feecollectiontype,
+				'collectioncounter' => $collectioncounter,
+				'collectiontype'	=> $collectiontype,
+				'account'	=> $account,
+				'collection_type' => $collection_type
+			);
+			$this->load->view('Reports/monthly_collection_pdf', $array);
+
+			$html = $this->output->get_output();
+			$this->load->library('pdf');
+			$this->dompdf->loadHtml($html);
+			$this->dompdf->setPaper('A3', 'landscape');
+			$this->dompdf->render();
+			$this->dompdf->stream("Monthly_None.pdf", array("Attachment" => 0));
+		} else {
+			$data1 = "dada";
+		}
+	}
+	public function monthly_report1()
+	{
+		//echo "<pre>";print_r($_POST);die;
+		ini_set('display_errors', -1);
+		$collectiontype    = $this->input->post('ct2');
+		$feecollectiontype = $this->input->post('fct2');
+		$collectioncounter = $this->input->post('cc2');
+		$single			   = $this->input->post('sd2');
+		$double			   = $this->input->post('sdf2');
+
+		// Declare an empty array 
+		$array_date = array();
+
+		// Use strtotime function 
+		$Variable1 = strtotime($single);
+		$Variable2 = strtotime($double);
+
+		// Use for loop to store dates into array 
+		// 86400 sec = 24 hrs = 60*60*24 = 1 day 
+		for (
+			$currentDate = $Variable1;
+			$currentDate <= $Variable2;
+			$currentDate += (86400)
+		) {
+
+			$Store = date('Y-m-d', $currentDate);
+			$array_date[] = $Store;
+		}
+		$count_date = count($array_date);
+
+		for ($i = 1; $i <= 25; $i++) {
+			$feehead[$i] = $this->dbcon->select('feehead', '*', "ACT_CODE='$i'");
+		}
+		$School_setting = $this->dbcon->select('school_setting', '*');
+		$session_master = $this->dbcon->select('session_master', '*', "Active_Status=1");
+		$account = $this->dbcon->select('accg', '*');
+		if ($feecollectiontype == 'All') {
+			$data_array = array();
+			for ($i = 0; $i < $count_date; $i++) {
+				if ($collectioncounter == '%') {
+					$data1 = $this->dbcon->selectSingleData('daycoll', 'DISTINCT(RECT_DATE)AS RECT_DATE, min(RECT_NO) AS RECT_NO_start, MAX(RECT_NO) AS RECT_NO_end, sum(TOTAL) AS TOTAL, sum(Fee1) AS Fee1, SUM(Fee2) AS Fee2, SUM(Fee3)Fee3, sum(Fee4)Fee4, sum(Fee5)Fee5, sum(Fee6)Fee6, sum(Fee7)Fee7, sum(Fee8)Fee8, sum(Fee9)Fee9, sum(Fee10)Fee10, sum(Fee11)Fee11, SUM(Fee12)Fee12, sum(Fee13)Fee13, SUM(Fee14)Fee14, SUM(Fee15)Fee15, sum(Fee16)Fee16, sum(Fee17)Fee17, sum(Fee18)Fee18, sum(Fee19)Fee19, sum(Fee20)Fee20, sum(Fee21)Fee21, sum(Fee22)Fee22, SUM(Fee23)Fee23, sum(Fee24)Fee24, SUM(Fee25)Fee25', "Collection_Mode=$collectiontype AND RECT_DATE='$array_date[$i]'");
+					$data_array[] = $data1;
+				} else {
+					$data1 = $this->dbcon->selectSingleData('daycoll', 'DISTINCT(RECT_DATE)AS RECT_DATE, min(RECT_NO) AS RECT_NO_start, MAX(RECT_NO) AS RECT_NO_end, sum(TOTAL) AS TOTAL, sum(Fee1) AS Fee1, SUM(Fee2) AS Fee2, SUM(Fee3)Fee3, sum(Fee4)Fee4, sum(Fee5)Fee5, sum(Fee6)Fee6, sum(Fee7)Fee7, sum(Fee8)Fee8, sum(Fee9)Fee9, sum(Fee10)Fee10, sum(Fee11)Fee11, SUM(Fee12)Fee12, sum(Fee13)Fee13, SUM(Fee14)Fee14, SUM(Fee15)Fee15, sum(Fee16)Fee16, sum(Fee17)Fee17, sum(Fee18)Fee18, sum(Fee19)Fee19, sum(Fee20)Fee20, sum(Fee21)Fee21, sum(Fee22)Fee22, SUM(Fee23)Fee23, sum(Fee24)Fee24, SUM(Fee25)Fee25', "User_Id LIKE '$collectioncounter' && Collection_Mode=$collectiontype AND RECT_DATE='$array_date[$i]'");
+					$data_array[] = $data1;
+				}
+			}
+			$collection_type = $this->dbcon->select('daycoll', '*', "Collection_Mode=$collectiontype AND RECT_DATE>='$single' AND RECT_DATE<='$double'");
+
+			$array = array(
+				'data_array' => $data_array,
+				'feehead1'  => $feehead[1],
+				'feehead2'  => $feehead[2],
+				'feehead3'  => $feehead[3],
+				'feehead4'  => $feehead[4],
+				'feehead5'  => $feehead[5],
+				'feehead6'  => $feehead[6],
+				'feehead7'  => $feehead[7],
+				'feehead8'  => $feehead[8],
+				'feehead9'  => $feehead[9],
+				'feehead10' => $feehead[10],
+				'feehead11' => $feehead[11],
+				'feehead12' => $feehead[12],
+				'feehead13' => $feehead[13],
+				'feehead14' => $feehead[14],
+				'feehead15' => $feehead[15],
+				'feehead16' => $feehead[16],
+				'feehead17' => $feehead[17],
+				'feehead18' => $feehead[18],
+				'feehead19' => $feehead[19],
+				'feehead20' => $feehead[20],
+				'feehead21' => $feehead[21],
+				'feehead22' => $feehead[22],
+				'feehead23' => $feehead[23],
+				'feehead24' => $feehead[24],
+				'feehead25' => $feehead[25],
+				'fromdate'  => $single,
+				'todate'    => $double,
+				'School_setting' => $School_setting,
+				'feecollectiontype' => $feecollectiontype,
+				'collectioncounter' => $collectioncounter,
+				'account'	=> $account,
+				'collection_type' => $collection_type
+			);
+			$this->load->view('Reports/monthly_collection_pdf', $array);
+
+			$html = $this->output->get_output();
+			$this->load->library('pdf');
+			$this->dompdf->loadHtml($html);
+			$this->dompdf->setPaper('A3', 'landscape');
+			$this->dompdf->render();
+			$this->dompdf->stream("Monthly_report_all.pdf", array("Attachment" => 0));
+		}
+		if ($feecollectiontype == 'PRE') {
+			$data_array = array();
+			for ($i = 0; $i < $count_date; $i++) {
+				if ($collectioncounter == '%') {
+					$data1 = $this->dbcon->selectSingleData('previous_year_collection', 'DISTINCT(RECT_DATE)AS RECT_DATE, min(RECT_NO) AS RECT_NO_start, MAX(RECT_NO) AS RECT_NO_end, sum(TOTAL) AS TOTAL, sum(Fee1) AS Fee1, SUM(Fee2) AS Fee2, SUM(Fee3)Fee3, sum(Fee4)Fee4, sum(Fee5)Fee5, sum(Fee6)Fee6, sum(Fee7)Fee7, sum(Fee8)Fee8, sum(Fee9)Fee9, sum(Fee10)Fee10, sum(Fee11)Fee11, SUM(Fee12)Fee12, sum(Fee13)Fee13, SUM(Fee14)Fee14, SUM(Fee15)Fee15, sum(Fee16)Fee16, sum(Fee17)Fee17, sum(Fee18)Fee18, sum(Fee19)Fee19, sum(Fee20)Fee20, sum(Fee21)Fee21, sum(Fee22)Fee22, SUM(Fee23)Fee23, sum(Fee24)Fee24, SUM(Fee25)Fee25', "Collection_Mode=$collectiontype AND RECT_DATE='$array_date[$i]'");
+					$data_array[] = $data1;
+				} else {
+
+					$data1 = $this->dbcon->selectSingleData('previous_year_collection', 'DISTINCT(RECT_DATE)AS RECT_DATE, min(RECT_NO) AS RECT_NO_start, MAX(RECT_NO) AS RECT_NO_end, sum(TOTAL) AS TOTAL, sum(Fee1) AS Fee1, SUM(Fee2) AS Fee2, SUM(Fee3)Fee3, sum(Fee4)Fee4, sum(Fee5)Fee5, sum(Fee6)Fee6, sum(Fee7)Fee7, sum(Fee8)Fee8, sum(Fee9)Fee9, sum(Fee10)Fee10, sum(Fee11)Fee11, SUM(Fee12)Fee12, sum(Fee13)Fee13, SUM(Fee14)Fee14, SUM(Fee15)Fee15, sum(Fee16)Fee16, sum(Fee17)Fee17, sum(Fee18)Fee18, sum(Fee19)Fee19, sum(Fee20)Fee20, sum(Fee21)Fee21, sum(Fee22)Fee22, SUM(Fee23)Fee23, sum(Fee24)Fee24, SUM(Fee25)Fee25', "User_Id LIKE '$collectioncounter' && Collection_Mode=$collectiontype AND RECT_DATE='$array_date[$i]'");
+					$data_array[] = $data1;
+				}
+			}
+			$collection_type = $this->dbcon->select('previous_year_collection', '*', "Collection_Mode=$collectiontype AND RECT_DATE>='$single' AND RECT_DATE<='$double'");
+
+			$array = array(
+				'data_array' => $data_array,
+				'feehead1'  => $feehead[1],
+				'feehead2'  => $feehead[2],
+				'feehead3'  => $feehead[3],
+				'feehead4'  => $feehead[4],
+				'feehead5'  => $feehead[5],
+				'feehead6'  => $feehead[6],
+				'feehead7'  => $feehead[7],
+				'feehead8'  => $feehead[8],
+				'feehead9'  => $feehead[9],
+				'feehead10' => $feehead[10],
+				'feehead11' => $feehead[11],
+				'feehead12' => $feehead[12],
+				'feehead13' => $feehead[13],
+				'feehead14' => $feehead[14],
+				'feehead15' => $feehead[15],
+				'feehead16' => $feehead[16],
+				'feehead17' => $feehead[17],
+				'feehead18' => $feehead[18],
+				'feehead19' => $feehead[19],
+				'feehead20' => $feehead[20],
+				'feehead21' => $feehead[21],
+				'feehead22' => $feehead[22],
+				'feehead23' => $feehead[23],
+				'feehead24' => $feehead[24],
+				'feehead25' => $feehead[25],
+				'fromdate'  => $single,
+				'todate'    => $double,
+				'School_setting' => $School_setting,
+				'feecollectiontype' => $feecollectiontype,
+				'collectioncounter' => $collectioncounter,
+				'account'	=> $account,
+				'collection_type' => $collection_type
+			);
+			$this->load->view('Reports/monthly_collection_pdf', $array);
+
+			$html = $this->output->get_output();
+			$this->load->library('pdf');
+			$this->dompdf->loadHtml($html);
+			$this->dompdf->setPaper('A3', 'landscape');
+			$this->dompdf->render();
+			$this->dompdf->stream("Monthly_report_all.pdf", array("Attachment" => 0));
+		} else if ($feecollectiontype == 'Monthly') {
+			$data_array = array();
+			for ($i = 0; $i < $count_date; $i++) {
+				if ($collectioncounter == '%') {
+					$data1 = $this->dbcon->selectSingleData('daycoll', 'DISTINCT(RECT_DATE)AS RECT_DATE, min(RECT_NO) AS RECT_NO_start, MAX(RECT_NO) AS RECT_NO_end, sum(TOTAL) AS TOTAL, sum(Fee1) AS Fee1, SUM(Fee2) AS Fee2, SUM(Fee3)Fee3, sum(Fee4)Fee4, sum(Fee5)Fee5, sum(Fee6)Fee6, sum(Fee7)Fee7, sum(Fee8)Fee8, sum(Fee9)Fee9, sum(Fee10)Fee10, sum(Fee11)Fee11, SUM(Fee12)Fee12, sum(Fee13)Fee13, SUM(Fee14)Fee14, SUM(Fee15)Fee15, sum(Fee16)Fee16, sum(Fee17)Fee17, sum(Fee18)Fee18, sum(Fee19)Fee19, sum(Fee20)Fee20, sum(Fee21)Fee21, sum(Fee22)Fee22, SUM(Fee23)Fee23, sum(Fee24)Fee24, SUM(Fee25)Fee25', "ADM_NO!='NONE' && mid(period,1,4)!='MISL' && mid(period,1,3)!='PRE' && Collection_Mode='$collectiontype' && RECT_DATE='$array_date[$i]'");
+					$data_array[] = $data1;
+				} else {
+					$data1 = $this->dbcon->selectSingleData('daycoll', 'DISTINCT(RECT_DATE)AS RECT_DATE, min(RECT_NO) AS RECT_NO_start, MAX(RECT_NO) AS RECT_NO_end, sum(TOTAL) AS TOTAL, sum(Fee1) AS Fee1, SUM(Fee2) AS Fee2, SUM(Fee3)Fee3, sum(Fee4)Fee4, sum(Fee5)Fee5, sum(Fee6)Fee6, sum(Fee7)Fee7, sum(Fee8)Fee8, sum(Fee9)Fee9, sum(Fee10)Fee10, sum(Fee11)Fee11, SUM(Fee12)Fee12, sum(Fee13)Fee13, SUM(Fee14)Fee14, SUM(Fee15)Fee15, sum(Fee16)Fee16, sum(Fee17)Fee17, sum(Fee18)Fee18, sum(Fee19)Fee19, sum(Fee20)Fee20, sum(Fee21)Fee21, sum(Fee22)Fee22, SUM(Fee23)Fee23, sum(Fee24)Fee24, SUM(Fee25)Fee25', "ADM_NO!='NONE' && mid(period,1,4)!='MISL' && mid(period,1,3)!='PRE' && User_Id LIKE '$collectioncounter' && Collection_Mode='$collectiontype' && RECT_DATE='$array_date[$i]'");
+					$data_array[] = $data1;
+				}
+			}
+			if ($collectioncounter == '%') {
+				$collection_type = $this->dbcon->select('daycoll', '*', "ADM_NO!='NONE' && mid(period,1,4)!='MISL' && mid(period,1,3)!='PRE' && Collection_Mode='$collectiontype' && RECT_DATE>='$single' AND RECT_DATE<='$double'");
+			} else {
+				$collection_type = $this->dbcon->select('daycoll', '*', "ADM_NO!='NONE' && mid(period,1,4)!='MISL' && mid(period,1,3)!='PRE' && User_Id LIKE '$collectioncounter' && Collection_Mode='$collectiontype' && RECT_DATE>='$single' AND RECT_DATE<='$double'");
+			}
+			$array = array(
+				'data_array' => $data_array,
+				'feehead1'  => $feehead[1],
+				'feehead2'  => $feehead[2],
+				'feehead3'  => $feehead[3],
+				'feehead4'  => $feehead[4],
+				'feehead5'  => $feehead[5],
+				'feehead6'  => $feehead[6],
+				'feehead7'  => $feehead[7],
+				'feehead8'  => $feehead[8],
+				'feehead9'  => $feehead[9],
+				'feehead10' => $feehead[10],
+				'feehead11' => $feehead[11],
+				'feehead12' => $feehead[12],
+				'feehead13' => $feehead[13],
+				'feehead14' => $feehead[14],
+				'feehead15' => $feehead[15],
+				'feehead16' => $feehead[16],
+				'feehead17' => $feehead[17],
+				'feehead18' => $feehead[18],
+				'feehead19' => $feehead[19],
+				'feehead20' => $feehead[20],
+				'feehead21' => $feehead[21],
+				'feehead22' => $feehead[22],
+				'feehead23' => $feehead[23],
+				'feehead24' => $feehead[24],
+				'feehead25' => $feehead[25],
+				'fromdate'  => $single,
+				'todate'    => $double,
+				'School_setting' => $School_setting,
+				'feecollectiontype' => $feecollectiontype,
+				'collectioncounter' => $collectioncounter,
+				'account'	=> $account,
+				'collection_type' => $collection_type
+			);
+			$this->load->view('Reports/monthly_collection_pdf', $array);
+
+			$html = $this->output->get_output();
+			$this->load->library('pdf');
+			$this->dompdf->loadHtml($html);
+			$this->dompdf->setPaper('A3', 'landscape');
+			$this->dompdf->render();
+			$this->dompdf->stream("Monthly_Reports.pdf", array("Attachment" => 0));
+		} else if ($feecollectiontype == 'MISL') {
+			$data_array = array();
+			for ($i = 0; $i < $count_date; $i++) {
+				$data1 = $this->dbcon->selectSingleData('daycoll', 'DISTINCT(RECT_DATE)AS RECT_DATE, min(RECT_NO) AS RECT_NO_start, MAX(RECT_NO) AS RECT_NO_end, sum(TOTAL) AS TOTAL, sum(Fee1) AS Fee1, SUM(Fee2) AS Fee2, SUM(Fee3)Fee3, sum(Fee4)Fee4, sum(Fee5)Fee5, sum(Fee6)Fee6, sum(Fee7)Fee7, sum(Fee8)Fee8, sum(Fee9)Fee9, sum(Fee10)Fee10, sum(Fee11)Fee11, SUM(Fee12)Fee12, sum(Fee13)Fee13, SUM(Fee14)Fee14, SUM(Fee15)Fee15, sum(Fee16)Fee16, sum(Fee17)Fee17, sum(Fee18)Fee18, sum(Fee19)Fee19, sum(Fee20)Fee20, sum(Fee21)Fee21, sum(Fee22)Fee22, SUM(Fee23)Fee23, sum(Fee24)Fee24, SUM(Fee25)Fee25', "mid(period,1,4)='MISL' && User_Id LIKE '$collectioncounter' && Collection_Mode='$collectiontype' && RECT_DATE='$array_date[$i]'");
+				$data_array[] = $data1;
+			}
+			$collection_type = $this->dbcon->select('daycoll', '*', "mid(period,1,4)='MISL' && User_Id LIKE '$collectioncounter' && Collection_Mode='$collectiontype' && RECT_DATE>='$single' AND RECT_DATE<='$double'");
+			$array = array(
+				'data_array'     => $data_array,
+				'feehead1'  => $feehead[1],
+				'feehead2'  => $feehead[2],
+				'feehead3'  => $feehead[3],
+				'feehead4'  => $feehead[4],
+				'feehead5'  => $feehead[5],
+				'feehead6'  => $feehead[6],
+				'feehead7'  => $feehead[7],
+				'feehead8'  => $feehead[8],
+				'feehead9'  => $feehead[9],
+				'feehead10' => $feehead[10],
+				'feehead11' => $feehead[11],
+				'feehead12' => $feehead[12],
+				'feehead13' => $feehead[13],
+				'feehead14' => $feehead[14],
+				'feehead15' => $feehead[15],
+				'feehead16' => $feehead[16],
+				'feehead17' => $feehead[17],
+				'feehead18' => $feehead[18],
+				'feehead19' => $feehead[19],
+				'feehead20' => $feehead[20],
+				'feehead21' => $feehead[21],
+				'feehead22' => $feehead[22],
+				'feehead23' => $feehead[23],
+				'feehead24' => $feehead[24],
+				'feehead25' => $feehead[25],
+				'fromdate'  => $single,
+				'todate'    => $double,
+				'School_setting' => $School_setting,
+				'feecollectiontype' => $feecollectiontype,
+				'collectioncounter' => $collectioncounter,
+				'account'	=> $account,
+				'collection_type' => $collection_type
+			);
+			$this->load->view('Reports/monthly_collection_pdf', $array);
+
+			$html = $this->output->get_output();
+			$this->load->library('pdf');
+			$this->dompdf->loadHtml($html);
+			$this->dompdf->setPaper('A3', 'landscape');
+			$this->dompdf->render();
+			$this->dompdf->stream("Monthly_Misl.pdf", array("Attachment" => 0));
+		} else if ($feecollectiontype == 'NONE') {
+			$data_array = array();
+			for ($i = 0; $i < $count_date; $i++) {
+				$data1 = $this->dbcon->selectSingleData('daycoll', 'DISTINCT(RECT_DATE)AS RECT_DATE, min(RECT_NO) AS RECT_NO_start, MAX(RECT_NO) AS RECT_NO_end, sum(TOTAL) AS TOTAL, sum(Fee1) AS Fee1, SUM(Fee2) AS Fee2, SUM(Fee3)Fee3, sum(Fee4)Fee4, sum(Fee5)Fee5, sum(Fee6)Fee6, sum(Fee7)Fee7, sum(Fee8)Fee8, sum(Fee9)Fee9, sum(Fee10)Fee10, sum(Fee11)Fee11, SUM(Fee12)Fee12, sum(Fee13)Fee13, SUM(Fee14)Fee14, SUM(Fee15)Fee15, sum(Fee16)Fee16, sum(Fee17)Fee17, sum(Fee18)Fee18, sum(Fee19)Fee19, sum(Fee20)Fee20, sum(Fee21)Fee21, sum(Fee22)Fee22, SUM(Fee23)Fee23, sum(Fee24)Fee24, SUM(Fee25)Fee25', "ADM_NO='NONE' && User_Id LIKE '$collectioncounter' && Collection_Mode='$collectiontype' && RECT_DATE='$array_date[$i]'");
+				$data_array[] = $data1;
+			}
+			$collection_type = $this->dbcon->select('daycoll', '*', "ADM_NO='NONE' && User_Id LIKE '$collectioncounter' && Collection_Mode='$collectiontype' && RECT_DATE>='$single' AND RECT_DATE<='$double'");
+			$array = array(
+				'data_array' => $data_array,
+				'feehead1'  => $feehead[1],
+				'feehead2'  => $feehead[2],
+				'feehead3'  => $feehead[3],
+				'feehead4'  => $feehead[4],
+				'feehead5'  => $feehead[5],
+				'feehead6'  => $feehead[6],
+				'feehead7'  => $feehead[7],
+				'feehead8'  => $feehead[8],
+				'feehead9'  => $feehead[9],
+				'feehead10' => $feehead[10],
+				'feehead11' => $feehead[11],
+				'feehead12' => $feehead[12],
+				'feehead13' => $feehead[13],
+				'feehead14' => $feehead[14],
+				'feehead15' => $feehead[15],
+				'feehead16' => $feehead[16],
+				'feehead17' => $feehead[17],
+				'feehead18' => $feehead[18],
+				'feehead19' => $feehead[19],
+				'feehead20' => $feehead[20],
+				'feehead21' => $feehead[21],
+				'feehead22' => $feehead[22],
+				'feehead23' => $feehead[23],
+				'feehead24' => $feehead[24],
+				'feehead25' => $feehead[25],
+				'fromdate'  => $single,
+				'todate'    => $double,
+				'School_setting' => $School_setting,
+				'feecollectiontype' => $feecollectiontype,
+				'collectioncounter' => $collectioncounter,
+				'account'	=> $account,
+				'collection_type' => $collection_type
+			);
+			$this->load->view('Reports/monthly_collection_pdf', $array);
+
+			$html = $this->output->get_output();
+			$this->load->library('pdf');
+			$this->dompdf->loadHtml($html);
+			$this->dompdf->setPaper('A3', 'landscape');
+			$this->dompdf->render();
+			$this->dompdf->stream("Monthly_None.pdf", array("Attachment" => 0));
+		} else {
+			$data1 = "dada";
+		}
+	}
+	public function Fee_Defaulter_List()
+	{
+		$month_master = $this->dbcon->select('feegeneration', 'DISTINCT(Month_NM)');
+		$class = $this->dbcon->select('classes', '*');
+		$sec = $this->dbcon->select('sections', '*', 'section_no not in (17,21,22,23,24)');
+		$array = array(
+			'month_master' => $month_master,
+			'class' => $class,
+			'sec' => $sec
+		);
+		$this->fee_template('Reports/defaulter_list', $array);
+	}
+	public function Fee_head_Defaulter_List()
+	{
+		$month_master = $this->dbcon->select('feegeneration', 'DISTINCT(Month_NM)');
+		$class = $this->dbcon->select('classes', '*');
+		$sec = $this->dbcon->select('sections', '*');
+		$feehead = $this->dbcon->select('feehead', 'SHNAME');
+		$array = array(
+			'month_master' => $month_master,
+			'class' => $class,
+			'sec' => $sec,
+			'feehead' => $feehead
+		);
+		$this->fee_template('Reports/defaulter_headwise_list', $array);
+	}
+
+	public function headwise_summary()
+	{
+		$ROLE_ID = $this->session->userdata('ROLE_ID');
+		$User_Id = $this->session->userdata('user_id');
+		if ($ROLE_ID == 10) { // setting role id for fee admin where role id is 10
+			$user_id = $this->dbcon->select('daycoll', 'DISTINCT(User_Id)');
+		} else { // setting role id for bank collection where role id is 14
+			$user_id = $this->dbcon->select('daycoll', 'DISTINCT(User_Id)', "User_Id='$User_Id'");
+		}
+
+		$data = array(
+			'user_id' => $user_id,
+			'ROLE_ID'  => $ROLE_ID
+		);
+
+		$this->fee_template('Reports/headwise_summary', $data);
+	}
+
+	public function headwise_data()
+	{
+		$collectiontype    = $this->input->post('collectiontype');
+		$collectioncounter = $this->input->post('collected_by');
+		$single			   = $this->input->post('strt_date');
+		$double			   = $this->input->post('end_date');
+		$feehead = array();
+	//echo '$collectiontype: '.'$collectiontype';
+	//die;
+		$feehead = $this->db->query("select FEE_HEAD from feehead order by ACT_CODE")->result();
+			if ($collectioncounter == '%') {
+			if ($collectiontype == 3) {
+				$data = $this->db->query("select sum(TOTAL)tot,sum(Fee1)Fee1,sum(Fee2)Fee2,sum(Fee3)Fee3,SUM(Fee4)Fee4,SUM(Fee5)Fee5,SUM(Fee6)Fee6,SUM(Fee7)Fee7,SUM(Fee8)Fee8,SUM(Fee9)Fee9,SUM(Fee10)Fee10,SUM(Fee11)Fee11,SUM(Fee12)Fee12,sum(Fee13)Fee13,sum(Fee14)Fee14,sum(Fee15)Fee15,SUM(Fee16)Fee16,SUM(Fee17)Fee17,SUM(Fee18)Fee18,SUM(Fee19)Fee19,SUM(Fee20)Fee20,SUM(Fee21)Fee21,SUM(Fee22)Fee22,SUM(Fee23)Fee23,SUM(Fee24)Fee24,SUM(Fee25)Fee25 from daycoll where RECT_DATE>='$single' AND RECT_DATE<='$double' AND RECT_NO like 'D%'")->result_array();
+			} elseif($collectiontype == 2) {
+				$data = $this->db->query("select sum(TOTAL)tot,sum(Fee1)Fee1,sum(Fee2)Fee2,sum(Fee3)Fee3,SUM(Fee4)Fee4,SUM(Fee5)Fee5,SUM(Fee6)Fee6,SUM(Fee7)Fee7,SUM(Fee8)Fee8,SUM(Fee9)Fee9,SUM(Fee10)Fee10,SUM(Fee11)Fee11,SUM(Fee12)Fee12,sum(Fee13)Fee13,sum(Fee14)Fee14,sum(Fee15)Fee15,SUM(Fee16)Fee16,SUM(Fee17)Fee17,SUM(Fee18)Fee18,SUM(Fee19)Fee19,SUM(Fee20)Fee20,SUM(Fee21)Fee21,SUM(Fee22)Fee22,SUM(Fee23)Fee23,SUM(Fee24)Fee24,SUM(Fee25)Fee25 from daycoll where RECT_DATE>='$single' AND RECT_DATE<='$double' AND RECT_NO like 'ON%'")->result_array();
+			}else{
+				$data = $this->db->query("select sum(TOTAL)tot,sum(Fee1)Fee1,sum(Fee2)Fee2,sum(Fee3)Fee3,SUM(Fee4)Fee4,SUM(Fee5)Fee5,SUM(Fee6)Fee6,SUM(Fee7)Fee7,SUM(Fee8)Fee8,SUM(Fee9)Fee9,SUM(Fee10)Fee10,SUM(Fee11)Fee11,SUM(Fee12)Fee12,sum(Fee13)Fee13,sum(Fee14)Fee14,sum(Fee15)Fee15,SUM(Fee16)Fee16,SUM(Fee17)Fee17,SUM(Fee18)Fee18,SUM(Fee19)Fee19,SUM(Fee20)Fee20,SUM(Fee21)Fee21,SUM(Fee22)Fee22,SUM(Fee23)Fee23,SUM(Fee24)Fee24,SUM(Fee25)Fee25 from daycoll where RECT_DATE>='$single' AND RECT_DATE<='$double' AND RECT_NO like 'A%'")->result_array();
+			}
+			
+		} 
+		
+			else{
+
+					$data = $this->db->query("select sum(TOTAL)tot,sum(Fee1)Fee1,sum(Fee2)Fee2,sum(Fee3)Fee3,SUM(Fee4)Fee4,SUM(Fee5)Fee5,SUM(Fee6)Fee6,SUM(Fee7)Fee7,SUM(Fee8)Fee8,SUM(Fee9)Fee9,SUM(Fee10)Fee10,SUM(Fee11)Fee11,SUM(Fee12)Fee12,sum(Fee13)Fee13,sum(Fee14)Fee14,sum(Fee15)Fee15,SUM(Fee16)Fee16,SUM(Fee17)Fee17,SUM(Fee18)Fee18,SUM(Fee19)Fee19,SUM(Fee20)Fee20,SUM(Fee21)Fee21,SUM(Fee22)Fee22,SUM(Fee23)Fee23,SUM(Fee24)Fee24,SUM(Fee25)Fee25 from daycoll where User_Id LIKE '$collectioncounter' AND Collection_Mode=$collectiontype AND RECT_DATE>='$single' AND RECT_DATE<='$double'")->result_array();
+			}
+
+			$array = array(
+				'data'     => $data,
+				'feehead' => $feehead,
+				'collectiontype' => $collectiontype,
+				'collectioncounter' => $collectioncounter,
+				'single' => $single,
+				'double' => $double,
+
+			);
+		$this->load->view('Reports/headwise_summary_report',$array);
+	}
+	
+	public function headwise_pdf(){
+		$collectiontype    = $this->input->post('collectiontype');
+		$collectioncounter = $this->input->post('collectioncounter');
+		$single			   = $this->input->post('single');
+		$double			   = $this->input->post('double');
+
+		$school_setting = $this->dbcon->select('school_setting','*');
+		$feehead = $this->db->query("select FEE_HEAD from feehead order by ACT_CODE")->result();
+		if($collectioncounter == '%')
+			{
+				$data = $this->db->query("select sum(TOTAL)tot,sum(Fee1)Fee1,sum(Fee2)Fee2,sum(Fee3)Fee3,SUM(Fee4)Fee4,SUM(Fee5)Fee5,SUM(Fee6)Fee6,SUM(Fee7)Fee7,SUM(Fee8)Fee8,SUM(Fee9)Fee9,SUM(Fee10)Fee10,SUM(Fee11)Fee11,SUM(Fee12)Fee12,sum(Fee13)Fee13,sum(Fee14)Fee14,sum(Fee15)Fee15,SUM(Fee16)Fee16,SUM(Fee17)Fee17,SUM(Fee18)Fee18,SUM(Fee19)Fee19,SUM(Fee20)Fee20,SUM(Fee21)Fee21,SUM(Fee22)Fee22,SUM(Fee23)Fee23,SUM(Fee24)Fee24,SUM(Fee25)Fee25 from daycoll where Collection_Mode=$collectiontype AND RECT_DATE>='$single' AND RECT_DATE<='$double'")->result_array();
+
+			}
+			else{
+
+					$data = $this->db->query("select sum(TOTAL)tot,sum(Fee1)Fee1,sum(Fee2)Fee2,sum(Fee3)Fee3,SUM(Fee4)Fee4,SUM(Fee5)Fee5,SUM(Fee6)Fee6,SUM(Fee7)Fee7,SUM(Fee8)Fee8,SUM(Fee9)Fee9,SUM(Fee10)Fee10,SUM(Fee11)Fee11,SUM(Fee12)Fee12,sum(Fee13)Fee13,sum(Fee14)Fee14,sum(Fee15)Fee15,SUM(Fee16)Fee16,SUM(Fee17)Fee17,SUM(Fee18)Fee18,SUM(Fee19)Fee19,SUM(Fee20)Fee20,SUM(Fee21)Fee21,SUM(Fee22)Fee22,SUM(Fee23)Fee23,SUM(Fee24)Fee24,SUM(Fee25)Fee25 from daycoll where User_Id LIKE '$collectioncounter' AND Collection_Mode=$collectiontype AND RECT_DATE>='$single' AND RECT_DATE<='$double'")->result_array();
+			}
+
+		$array = array(
+			'school_setting' => $school_setting,
+			'data' => $data,
+			'feehead' => $feehead,
+			'single' => $single,
+			'double' => $double,
+			'collectioncounter' => $collectioncounter,
+			'collectiontype' => $collectiontype,
+		);
+
+		$this->load->view('Reports/headwise_summary_pdf',$array);
+
+		$html = $this->output->get_output();
+		$this->load->library('pdf');
+		$this->dompdf->loadHtml($html);
+		$this->dompdf->setPaper('A4', 'Portrait');
+		$this->dompdf->render();
+		$this->dompdf->stream("Head wise Summary Report.pdf", array("Attachment"=>0));
+	}
+	public function headwise_data_PDF()
+	{
+		$collectiontype    = $this->input->post('collectiontype');
+		$collectioncounter = $this->input->post('collectioncounter');
+		$single			   = $this->input->post('single');
+		$double			   = $this->input->post('double');
+
+		$school_setting = $this->dbcon->select('school_setting','*');
+		$feehead = $this->db->query("select FEE_HEAD from feehead order by ACT_CODE")->result();
+		if ($collectioncounter == '%') {
+			if ($collectiontype == 3) {
+				$data = $this->db->query("select sum(TOTAL)tot,sum(Fee1)Fee1,sum(Fee2)Fee2,sum(Fee3)Fee3,SUM(Fee4)Fee4,SUM(Fee5)Fee5,SUM(Fee6)Fee6,SUM(Fee7)Fee7,SUM(Fee8)Fee8,SUM(Fee9)Fee9,SUM(Fee10)Fee10,SUM(Fee11)Fee11,SUM(Fee12)Fee12,sum(Fee13)Fee13,sum(Fee14)Fee14,sum(Fee15)Fee15,SUM(Fee16)Fee16,SUM(Fee17)Fee17,SUM(Fee18)Fee18,SUM(Fee19)Fee19,SUM(Fee20)Fee20,SUM(Fee21)Fee21,SUM(Fee22)Fee22,SUM(Fee23)Fee23,SUM(Fee24)Fee24,SUM(Fee25)Fee25 from daycoll where RECT_DATE>='$single' AND RECT_DATE<='$double' AND RECT_NO like 'D%'")->result_array();
+			} elseif($collectiontype == 2) {
+				$data = $this->db->query("select sum(TOTAL)tot,sum(Fee1)Fee1,sum(Fee2)Fee2,sum(Fee3)Fee3,SUM(Fee4)Fee4,SUM(Fee5)Fee5,SUM(Fee6)Fee6,SUM(Fee7)Fee7,SUM(Fee8)Fee8,SUM(Fee9)Fee9,SUM(Fee10)Fee10,SUM(Fee11)Fee11,SUM(Fee12)Fee12,sum(Fee13)Fee13,sum(Fee14)Fee14,sum(Fee15)Fee15,SUM(Fee16)Fee16,SUM(Fee17)Fee17,SUM(Fee18)Fee18,SUM(Fee19)Fee19,SUM(Fee20)Fee20,SUM(Fee21)Fee21,SUM(Fee22)Fee22,SUM(Fee23)Fee23,SUM(Fee24)Fee24,SUM(Fee25)Fee25 from daycoll where RECT_DATE>='$single' AND RECT_DATE<='$double' AND RECT_NO like 'ON%'")->result_array();
+			}else{
+				$data = $this->db->query("select sum(TOTAL)tot,sum(Fee1)Fee1,sum(Fee2)Fee2,sum(Fee3)Fee3,SUM(Fee4)Fee4,SUM(Fee5)Fee5,SUM(Fee6)Fee6,SUM(Fee7)Fee7,SUM(Fee8)Fee8,SUM(Fee9)Fee9,SUM(Fee10)Fee10,SUM(Fee11)Fee11,SUM(Fee12)Fee12,sum(Fee13)Fee13,sum(Fee14)Fee14,sum(Fee15)Fee15,SUM(Fee16)Fee16,SUM(Fee17)Fee17,SUM(Fee18)Fee18,SUM(Fee19)Fee19,SUM(Fee20)Fee20,SUM(Fee21)Fee21,SUM(Fee22)Fee22,SUM(Fee23)Fee23,SUM(Fee24)Fee24,SUM(Fee25)Fee25 from daycoll where RECT_DATE>='$single' AND RECT_DATE<='$double' AND RECT_NO like 'A%'")->result_array();
+			}
+			
+		} 
+		
+			else{
+
+					$data = $this->db->query("select sum(TOTAL)tot,sum(Fee1)Fee1,sum(Fee2)Fee2,sum(Fee3)Fee3,SUM(Fee4)Fee4,SUM(Fee5)Fee5,SUM(Fee6)Fee6,SUM(Fee7)Fee7,SUM(Fee8)Fee8,SUM(Fee9)Fee9,SUM(Fee10)Fee10,SUM(Fee11)Fee11,SUM(Fee12)Fee12,sum(Fee13)Fee13,sum(Fee14)Fee14,sum(Fee15)Fee15,SUM(Fee16)Fee16,SUM(Fee17)Fee17,SUM(Fee18)Fee18,SUM(Fee19)Fee19,SUM(Fee20)Fee20,SUM(Fee21)Fee21,SUM(Fee22)Fee22,SUM(Fee23)Fee23,SUM(Fee24)Fee24,SUM(Fee25)Fee25 from daycoll where User_Id LIKE '$collectioncounter' AND Collection_Mode=$collectiontype AND RECT_DATE>='$single' AND RECT_DATE<='$double'")->result_array();
+			}
+
+		$array = array(
+			'school_setting' => $school_setting,
+			'data' => $data,
+			'feehead' => $feehead,
+			'single' => $single,
+			'double' => $double,
+			'collectioncounter' => $collectioncounter,
+			'collectiontype' => $collectiontype,
+		);
+
+		$this->load->view('Reports/headwise_summary_pdf',$array);
+
+		$html = $this->output->get_output();
+		$this->load->library('pdf');
+		$this->dompdf->loadHtml($html);
+		$this->dompdf->setPaper('A4', 'Portrait');
+		$this->dompdf->render();
+		$this->dompdf->stream("Head_Wise_Summary_Report.pdf", array("Attachment" => 0));
+	}
+	
+	//new reports
+	public function Fee_Paid_List()
+	{
+		$month_master = $this->dbcon->select('feegeneration', 'DISTINCT(Month_NM)');
+		$class = $this->dbcon->select('classes', '*');
+		$sec = $this->dbcon->select('sections', '*');
+		$array = array(
+			'month_master' => $month_master,
+			'class' => $class,
+			'sec' => $sec
+		);
+		//$this->fee_template('Reports/fee_paid_list', $array);
+		$this->fee_template('Reports/fee_paid_list', $array);
+	}
+	//17-04-2023
+	public function adv_fee_coll()
+	{
+		$this->fee_template('Reports/adv_fee_coll');
+	}
+	public function adv_coll_data()
+	{
+		$start_date= $this->input->post('strt_date');
+		$end_date= $this->input->post('end_date');
+
+		$feehead = $this->db->query("select FEE_HEAD from feehead order by ACT_CODE")->result();
+
+		$data = $this->db->query("select sum(TOTAL)TOT,sum(Fee1)Fee1,sum(Fee2)Fee2,sum(Fee3)Fee3,sum(Fee4)Fee4,sum(Fee5)Fee5,sum(Fee6)Fee6,sum(Fee7)Fee7,sum(Fee8)Fee8,sum(Fee9)Fee9,sum(Fee10)Fee10,sum(Fee11)Fee11,sum(Fee12)Fee12,sum(Fee13)Fee13,sum(Fee14)Fee14,sum(Fee15)Fee15,sum(Fee16)Fee16,sum(Fee17)Fee17,sum(Fee18)Fee18,sum(Fee19)Fee19,sum(Fee20)Fee20,sum(Fee21)Fee21,sum(Fee22)Fee22,sum(Fee23)Fee23,sum(Fee24)Fee24,sum(Fee25)Fee25 from DAYCOLL where RECT_DATE between '$start_date' and '$end_date' and SEC='Z'")->result_array();
+
+		$array = array(
+			'start_date' => $start_date,
+			'end_date' => $end_date,
+			'feehead' => $feehead,
+			'data' => $data
+		);
+		// echo $this->db->last_query();
+		// echo "<pre>";
+		// print_r($array);
+		$this->load->view('Reports/adv_fee_coll_report',$array);
+	}
+
+	public function adv_coll_data_pdf()
+	{
+		$start_date= $this->input->post('start_date');
+		$end_date= $this->input->post('end_date');
+
+		$school_setting = $this->dbcon->select('school_setting','*');
+		$feehead = $this->db->query("select FEE_HEAD from feehead order by ACT_CODE")->result();
+
+		$data = $this->db->query("select sum(TOTAL)TOT,sum(Fee1)Fee1,sum(Fee2)Fee2,sum(Fee3)Fee3,sum(Fee4)Fee4,sum(Fee5)Fee5,sum(Fee6)Fee6,sum(Fee7)Fee7,sum(Fee8)Fee8,sum(Fee9)Fee9,sum(Fee10)Fee10,sum(Fee11)Fee11,sum(Fee12)Fee12,sum(Fee13)Fee13,sum(Fee14)Fee14,sum(Fee15)Fee15,sum(Fee16)Fee16,sum(Fee17)Fee17,sum(Fee18)Fee18,sum(Fee19)Fee19,sum(Fee20)Fee20,sum(Fee21)Fee21,sum(Fee22)Fee22,sum(Fee23)Fee23,sum(Fee24)Fee24,sum(Fee25)Fee25 from DAYCOLL where RECT_DATE between '$start_date' and '$end_date' and SEC='Z'")->result_array();
+
+		$array = array(
+			'school_setting' =>$school_setting,
+			'start_date' => $start_date,
+			'end_date' => $end_date,
+			'feehead' => $feehead,
+			'data' => $data
+		);
+		// echo $this->db->last_query();
+		// echo "<pre>";
+		// print_r($array);
+		$this->load->view('Reports/adv_fee_coll_report_pdf',$array);
+
+		$html = $this->output->get_output();
+		$this->load->library('pdf');
+		$this->dompdf->loadHtml($html);
+		$this->dompdf->setPaper('A4', 'Portrait');
+		$this->dompdf->render();
+		$this->dompdf->stream("Advance Fee Collection Report.pdf", array("Attachment" => 0));
+	}
+	
+	public function prev_year_col()
+	{
+		$ROLE_ID = $this->session->userdata('ROLE_ID');
+		$User_Id = $this->session->userdata('user_id');
+		if ($ROLE_ID == 10) { // setting role id for fee admin where role id is 10
+			$user_id = $this->dbcon->select('daycoll', 'DISTINCT(User_Id)');
+		} else { // setting role id for bank collection where role id is 14
+			$user_id = $this->dbcon->select('daycoll', 'DISTINCT(User_Id)', "User_Id='$User_Id'");
+		}
+
+		$data = array(
+			'user_id' => $user_id,
+			'ROLE_ID'  => $ROLE_ID
+		);
+
+		// $this->fee_template('Reports/headwise_summary', $data);
+		$this->fee_template('Reports/prev_year_col', $data);
+	}
+
+	public function prev_headwise_data()
+	{
+		$single			   = $this->input->post('strt_date');
+		$double			   = $this->input->post('end_date');
+		$feehead = array();
+		$feehead = $this->db->query("select FEE_HEAD from feehead order by ACT_CODE")->result();
+		
+		$data = $this->db->query("select sum(TOTAL)tot,sum(Fee1)Fee1,sum(Fee2)Fee2,sum(Fee3)Fee3,SUM(Fee4)Fee4,SUM(Fee5)Fee5,SUM(Fee6)Fee6,SUM(Fee7)Fee7,SUM(Fee8)Fee8,SUM(Fee9)Fee9,SUM(Fee10)Fee10,SUM(Fee11)Fee11,SUM(Fee12)Fee12,sum(Fee13)Fee13,sum(Fee14)Fee14,sum(Fee15)Fee15,SUM(Fee16)Fee16,SUM(Fee17)Fee17,SUM(Fee18)Fee18,SUM(Fee19)Fee19,SUM(Fee20)Fee20,SUM(Fee21)Fee21,SUM(Fee22)Fee22,SUM(Fee23)Fee23,SUM(Fee24)Fee24,SUM(Fee25)Fee25 from previous_year_collection where RECT_DATE>='$single' AND RECT_DATE<='$double'")->result_array();	
+
+		$array = array(
+			'data'     => $data,
+			'feehead' => $feehead,
+			'single' => $single,
+			'double' => $double,
+
+		);
+
+		$this->load->view('Reports/prev_headwise_summary_report', $array);
+	}
+
+	public function prev_headwise_data_PDF()
+	{
+		$single			   = $this->input->post('single');
+		$double			   = $this->input->post('double');
+		$feehead = array();
+		
+		$feehead = $this->db->query("select FEE_HEAD from feehead order by ACT_CODE")->result();
+		$school_setting = $this->dbcon->select('school_setting', '*');
+		$data = $this->db->query("select sum(TOTAL)tot,sum(Fee1)Fee1,sum(Fee2)Fee2,sum(Fee3)Fee3,SUM(Fee4)Fee4,SUM(Fee5)Fee5,SUM(Fee6)Fee6,SUM(Fee7)Fee7,SUM(Fee8)Fee8,SUM(Fee9)Fee9,SUM(Fee10)Fee10,SUM(Fee11)Fee11,SUM(Fee12)Fee12,sum(Fee13)Fee13,sum(Fee14)Fee14,sum(Fee15)Fee15,SUM(Fee16)Fee16,SUM(Fee17)Fee17,SUM(Fee18)Fee18,SUM(Fee19)Fee19,SUM(Fee20)Fee20,SUM(Fee21)Fee21,SUM(Fee22)Fee22,SUM(Fee23)Fee23,SUM(Fee24)Fee24,SUM(Fee25)Fee25 from previous_year_collection where RECT_DATE>='$single' AND RECT_DATE<='$double'")->result_array();
+		// echo $this->db->last_query();
+		// echo '<pre>';
+		// print_r($data);
+		// die;
+
+		$array = array(
+			'school_setting' => $school_setting,
+			'data'     => $data,
+			'feehead' => $feehead,
+			'single' => $single,
+			'double' => $double
+
+		);
+
+		$this->load->view('Reports/prev_headwise_summary_pdf', $array);
+
+		$html = $this->output->get_output();
+		$this->load->library('pdf');
+		$this->dompdf->loadHtml($html);
+		$this->dompdf->setPaper('A4', 'Portrait');
+		$this->dompdf->render();
+		$this->dompdf->stream("Previous_year_Report.pdf", array("Attachment" => 0));
+	}
+	public function Bank_trans()
+	{
+		$data=$this->db->query("SELECT d.RECT_NO , d.RECT_DATE , d.ADM_NO ,d.TOTAL ,d.CHQ_NO , ot.order_id,ot.trans_date  FROM daycoll d INNER JOIN online_transaction ot ON d.CHQ_NO=ot.ORDER_ID WHERE d.RECT_NO LIKE 'O%';")->result();
+		$array = array(
+			'data' => $data
+		);
+	
+		$this->fee_template('Reports/bank_trans_data', $array);
+	}
+	
+}
