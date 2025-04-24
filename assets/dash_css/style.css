@@ -156,24 +156,35 @@ li.breadcrumb-item i.fa.fa-angle-right {
 }
 
 /* Sidebar Menu Base Styles */
+/* Sidebar Menu Base Styles */
 .sidebar-menu {
     position: fixed;
     top: 0;
     left: 0;
     bottom: 0;
-    width: 230px;
-    /* Reduced width as requested */
+    width: 200px;
+    /* Expanded width */
     background: linear-gradient(180deg, #1e2a38 0%, #2c3e50 100%);
-    /* Subtle gradient for a modern look */
+    /* Subtle gradient */
     color: #ecf0f1;
     /* Light text color */
-    overflow-y: auto;
-    /* Enable vertical scrollbar */
+    overflow-y: scroll;
+    /* Enable vertical scrolling */
     z-index: 999;
-    transition: all 0.3s ease-in-out;
-    /* Smooth transition for collapse/expand */
+    transition: width 0.3s ease-in-out;
+    /* Smooth transition for width change */
     box-shadow: 2px 0 10px rgba(0, 0, 0, 0.3);
     /* Subtle shadow for depth */
+    -ms-overflow-style: none;
+    /* Hide scrollbar for IE and Edge */
+    scrollbar-width: none;
+    /* Hide scrollbar for Firefox */
+}
+
+/* Hide Scrollbar for Chrome, Safari, and Opera */
+.sidebar-menu::-webkit-scrollbar {
+    display: none;
+    /* Hide scrollbar but keep scrolling functionality */
 }
 
 /* Sidebar Header (Toggle Icon) */
@@ -182,19 +193,55 @@ li.breadcrumb-item i.fa.fa-angle-right {
     text-align: center;
     background: #3498db;
     /* Bright blue header */
+    position: sticky;
+    /* Keep header at the top */
+    top: 0;
+    z-index: 1000;
+    /* Ensure header stays above menu items */
+}
+
+/* Sidebar Icon */
+/* Sidebar Menu Base Styles */
+.sidebar-menu {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 200px; /* Expanded width */
+    background: linear-gradient(180deg, #1e2a38 0%, #2c3e50 100%); /* Subtle gradient */
+    color: #ecf0f1; /* Light text color */
+    overflow-y: scroll; /* Enable vertical scrolling */
+    z-index: 999;
+    transition: width 0.3s ease-in-out; /* Smooth transition for width change */
+    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.3); /* Subtle shadow for depth */
+    -ms-overflow-style: none; /* Hide scrollbar for IE and Edge */
+    scrollbar-width: none; /* Hide scrollbar for Firefox */
+}
+
+/* Hide Scrollbar for Chrome, Safari, and Opera */
+.sidebar-menu::-webkit-scrollbar {
+    display: none; /* Hide scrollbar but keep scrolling functionality */
+}
+
+/* Sidebar Header (Toggle Icon) */
+.logo1 {
+    padding: 20px;
+    text-align: center;
+    background: #3498db; /* Bright blue header */
+    position: sticky; /* Keep header at the top */
+    top: 0;
+    z-index: 1000; /* Ensure header stays above menu items */
 }
 
 /* Sidebar Icon */
 .sidebar-icon {
-    color: #ffffff;
-    /* White toggle icon */
+    color: #ffffff; /* White toggle icon */
     font-size: 22px;
     transition: color 0.3s ease;
 }
 
 .sidebar-icon:hover {
-    color: #f1c40f;
-    /* Yellow hover effect for toggle icon */
+    color: #f1c40f; /* Yellow hover effect */
 }
 
 /* Menu List Styles */
@@ -202,101 +249,92 @@ li.breadcrumb-item i.fa.fa-angle-right {
     list-style: none;
     margin: 0;
     padding: 0;
+    padding-bottom: 20px; /* Add padding at the bottom for last submenu */
 }
 
 #menu li {
     position: relative;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    /* Subtle divider */
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1); /* Subtle divider */
 }
 
 #menu li a {
     display: flex;
     align-items: center;
     padding: 15px 20px;
-    color: #ecf0f1;
-    /* Light text */
+    color: #ecf0f1; /* Light text */
     text-decoration: none;
     font-size: 14px;
     transition: all 0.3s ease;
+    position: relative; /* For positioning icons and text */
 }
 
 #menu li a:hover {
-    background-color: #34495e;
-    /* Slightly lighter background on hover */
+    background-color: #34495e; /* Slightly lighter background on hover */
     color: #ffffff;
-    padding-left: 25px;
-    /* Subtle indent on hover */
+    padding-left: 25px; /* Subtle indent on hover */
 }
 
-#menu li.active>a {
-    background-color: #3498db;
-    /* Bright blue for active state */
+#menu li.active > a {
+    background-color: #3498db; /* Bright blue for active state */
     color: #ffffff;
-    border-left: 4px solid #f1c40f;
-    /* Yellow accent for active state */
+    border-left: 4px solid #f1c40f; /* Yellow accent for active state */
 }
 
 /* Submenu Styles */
 #menu li ul {
-    display: none;
-    /* Hidden by default */
-    background: #34495e;
-    /* Slightly lighter background for submenu */
+    display: none; /* Hidden by default */
+    background: #34495e; /* Slightly lighter background for submenu */
     padding: 0;
     list-style: none;
-    position: relative;
-    /* Position below parent, not to the right */
-    width: 100%;
-    /* Full width of parent */
+    position: relative; /* Position below parent */
+    width: 100%; /* Full width of parent */
 }
 
-#menu li.active>ul {
-    display: block;
-    /* Show submenu when parent is active (toggled via JavaScript) */
+#menu li.active > ul {
+    display: block;_mono /* Show submenu when parent is active */
 }
 
+/* Submenu Items */
 #menu ul li {
-    border-bottom: none;
-    /* No divider for submenu items */
+    border-bottom: none; /* No divider for submenu items */
 }
 
 #menu ul li a {
-    padding: 10px 20px 10px 40px;
-    /* Indent submenu items */
+    padding: 10px 20px 10px 40px; /* Indent submenu items */
     font-size: 13px;
-    color: #bdc3c7;
-    /* Slightly lighter text for sub-items */
+    color: #bdc3c7; /* Slightly lighter text for sub-items */
     transition: all 0.3s ease;
 }
 
 #menu ul li a:hover {
-    background-color: #3e5c76;
-    /* Hover effect for submenu */
+    background-color: #3e5c76; /* Hover effect for submenu */
     color: #ffffff;
-    padding-left: 45px;
-    /* Subtle indent on hover */
+    padding-left: 45px; /* Subtle indent on hover */
+}
+
+/* Selected Submenu Item */
+#menu ul li a.selected {
+    background-color: #3498db; /* Highlight selected submenu item */
+    color: #ffffff;
+    border-left: 3px solid #f1c40f; /* Yellow accent for selected state */
 }
 
 /* Icons in Menu */
 #menu .fa {
-    margin-right: 10px;
-    /* Space between icon and text */
+    margin-right: 10px; /* Space between icon and text */
     font-size: 16px;
-    width: 20px;
-    /* Fixed width for alignment */
+    width: 20px; /* Fixed width for alignment */
     text-align: center;
+    transition: margin-right 0.3s ease; /* Smooth transition for collapsed state */
 }
 
 /* Collapsed Sidebar States */
 .page-container.sidebar-collapsed .sidebar-menu {
-    width: 60px;
-    /* Reduced width when collapsed */
+    width: 60px; /* Reduced width when collapsed */
 }
 
 .page-container.sidebar-collapsed-back .sidebar-menu {
-    width: 200px;
-    /* Restore width when expanded */
+    width: 200px; /* Restore width when expanded */
 }
 
 .page-container.sidebar-collapsed .sidebar-icon {
@@ -318,19 +356,38 @@ li.breadcrumb-item i.fa.fa-angle-right {
 }
 
 .page-container.sidebar-collapsed #menu span {
-    opacity: 0;
-    transition: all 50ms linear;
+    display: none; /* Hide text when collapsed */
 }
 
 .page-container.sidebar-collapsed-back #menu span {
+    display: inline-block; /* Show text when expanded */
     opacity: 1;
     transition: all 200ms linear;
     transition-delay: 300ms;
 }
 
 .page-container.sidebar-collapsed #menu li a i {
-    margin-right: 0;
-    /* Center icon when collapsed */
+    margin-right: 0; /* Remove margin to center icon when collapsed */
+}
+
+/* Submenu in Collapsed State */
+.page-container.sidebar-collapsed #menu li ul {
+    position: absolute; /* Position submenu to the right of the sidebar */
+    left: 60px; /* Align with the collapsed sidebar width */
+    top: 0;
+    width: 200px; /* Fixed width for submenu */
+    z-index: 1000; /* Ensure submenu appears above other content */
+    background: #34495e; /* Maintain submenu background */
+}
+
+/* Ensure submenu items are visible in collapsed state */
+.page-container.sidebar-collapsed #menu li.active > ul {
+    display: block; /* Show submenu when parent is active */
+}
+
+/* Adjust submenu links in collapsed state */
+.page-container.sidebar-collapsed #menu ul li a {
+    padding: 10px 20px; /* Adjust padding for submenu items */
 }
 
 /* Angle Icon for Dropdowns */
@@ -341,8 +398,57 @@ li.breadcrumb-item i.fa.fa-angle-right {
 }
 
 #menu li.active .fa-angle-right {
-    transform: rotate(90deg);
-    /* Rotate arrow when submenu is open */
+    transform: rotate(90deg); /* Rotate arrow when submenu is open */
+}
+
+/* Hide angle icon in collapsed state */
+.page-container.sidebar-collapsed #menu li .fa-angle-right {
+    display: none; /* Hide angle icon in collapsed state */
+}
+
+/* Mobile View Adjustments */
+@media (max-width: 768px) {
+    /* Ensure sidebar is expanded by default in mobile view */
+    .sidebar-menu {
+        width: 200px; /* Expanded width */
+    }
+
+    .page-container.sidebar-collapsed .sidebar-menu {
+        width: 200px; /* Force expanded state in mobile view */
+    }
+
+    .page-container.sidebar-collapsed-back .sidebar-menu {
+        width: 200px; /* Ensure expanded state */
+    }
+
+    /* Show text in mobile view */
+    .page-container.sidebar-collapsed #menu span {
+        display: inline-block; /* Show text in mobile view */
+        opacity: 1;
+    }
+
+    /* Restore angle icon in mobile view */
+    .page-container.sidebar-collapsed #menu li .fa-angle-right {
+        display: block; /* Show angle icon in mobile view */
+    }
+
+    /* Submenu in mobile view */
+    #menu li ul {
+        position: relative; /* Keep submenu below parent in mobile view */
+        left: 0; /* Align with parent */
+        width: 100%; /* Full width of sidebar */
+    }
+
+    .page-container.sidebar-collapsed #menu li ul {
+        position: relative; /* Override absolute positioning in mobile view */
+        left: 0; /* Align with parent */
+        width: 100%; /* Full width of sidebar */
+    }
+
+    /* Adjust submenu links in mobile view */
+    #menu ul li a {
+        padding: 10px 20px 10px 40px; /* Maintain indent for submenu items */
+    }
 }
 
 .panel-body.ont {
